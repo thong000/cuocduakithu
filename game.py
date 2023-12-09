@@ -6,7 +6,7 @@ import time
 
 pygame.init()
 
-#Mở file lan để xác định ngôn ngữ
+# Mở file lan để xác định ngôn ngữ
 with open('lan.txt', 'r') as file:
     l = file.read()
     if l == "1":
@@ -14,16 +14,21 @@ with open('lan.txt', 'r') as file:
     if l == "0":
         lan = False
 
+# mở file log dể biết tình trạng đăng nhập
+with open('log.txt', 'r') as file:
+    content = file.read()
+    if content == "1":
+        lock = True
+    if content == "0":
+        lock = False
+
 # Thông số cơ bản
 
 coin = 0
 speed = 5
 
-lock = False
-
 SCREEN_WIDTH = 1344
 SCREEN_HEIGHT = 756
-
 
 set_but_dis = SCREEN_WIDTH // 10
 set_but_x = SCREEN_WIDTH // 10
@@ -42,44 +47,18 @@ demomap_y = SCREEN_HEIGHT // 2
 demomap_w = SCREEN_WIDTH // 1.5
 demomap_h = SCREEN_HEIGHT // 1.5
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Cuộc đua kì thú")
-pygame.display.set_icon(pygame.image.load("SPEED RACE.png"))
-
-
-# vi tri nv
-w11_x = 0
-w12_x = 0
-w13_x = 0
-w14_x = 0
-w15_x = 0
-wi11 = 0
-wi12 = 0
-wi13 = 0
-wi14 = 0
-wi15 = 0
-
-x1 = random.uniform(0.8, 1.2)
-x2 = random.uniform(0.8, 1.2)
-x3 = random.uniform(0.8, 1.2)
-x4 = random.uniform(0.8, 1.2)
-x5 = random.uniform(0.8, 1.2)
-
 finish = SCREEN_WIDTH // 1.2
 
-game_font1 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 40)
-game_font2 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 25)
-game_font3 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 70)
-game_font4 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 80)
-game_font_mini = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 10)
+random_x1 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+random_x2 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+random_x3 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+random_x4 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+random_x5 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 
-with open('log.txt', 'r') as file:
-    content = file.read()
-    if content == "1":
-        lock = True
-    if content == "0":
-        lock = False
+# biến ngôn ngữ
 lan = True
+
+# Khởi tạo các biến logic để biết màn hình nào đang chạy (một lúc có 1)
 set_ = True
 wait = False
 set1 = False
@@ -98,6 +77,41 @@ setnv12 = False
 setnv22 = False
 flap = False
 
+# thiết lập màn hình
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Cuộc đua kì thú")
+pygame.display.set_icon(pygame.image.load("SPEED RACE.png"))
+
+# vị trí của nhân vật và các chỉ số chạy mảng
+w11_x = 0
+w12_x = 0
+w13_x = 0
+w14_x = 0
+w15_x = 0
+wi11 = 0
+wi12 = 0
+wi13 = 0
+wi14 = 0
+wi15 = 0
+
+# random tốc độ nhân vật
+x1 = random.uniform(0.8, 1.2)
+x2 = random.uniform(0.8, 1.2)
+x3 = random.uniform(0.8, 1.2)
+x4 = random.uniform(0.8, 1.2)
+x5 = random.uniform(0.8, 1.2)
+
+# font chữ ở nhiều kích thước khác nhau
+game_font1 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 40)
+game_font2 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 25)
+game_font3 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 70)
+game_font4 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 80)
+game_font_mini = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 10)
+
+# Các Class
+
+'''Background full màn hình'''
+
 
 class Background:
     def __init__(self, image):
@@ -109,6 +123,9 @@ class Background:
         sur.blit(self.bg_img, self.bg_rect)
 
 
+'''Button có chiều dài w, chiều rộng h, trung tâm của ảnh có tọa độ (x,y)'''
+
+
 class Button:
     def __init__(self, image, x, y, w, h):
         self.but_pos = (x, y)
@@ -118,8 +135,13 @@ class Button:
         self.image = image
         self.image_rect = self.image.get_rect(center=(x, y))
 
+    '''Ve hinh ở (x,y)'''
+
     def draw_but(self, sur):
         sur.blit(self.image, self.image_rect)
+
+
+'''một đoạn text có font là "font" nội dung là "text" có màu (r,g,b)'''
 
 
 class Text:
@@ -128,11 +150,51 @@ class Text:
         self.text = text
         self.font_but = self.font.render(text, True, (r, g, b))
 
+    '''Ve hinh ở (x,y)'''
+
     def draw_text(self, sur, x, y):
         sur.blit(self.font_but, (x, y))
 
 
-# Load nv set1 1
+'''Tao nhan vat'''
+
+
+class nhanVat:
+    def __init__(self, name, img_array, x, y, w, h):
+        self.name = name
+        self.img_array = img_array
+        self.x = x
+        self.y = y
+        self.name = Button(img_array, x, y, w, h)
+
+    def draw_nv(self):
+        self.name.draw_but(screen)
+
+    '''check va cham voi "sur" (box,vạch đích,...)'''
+
+    def check_vc(self, sur):
+        if self.name.image_rect.colliderect(sur.image_rect):
+            return True
+        else:
+            return False
+
+    '''Cac hieu ứng khi chạm box'''
+
+    def buff_speed(self, i):
+        bonus1 = random.randrange(1, 100)
+        bonus2 = random.randrange(1, 100)
+        bonus3 = random.randrange(1, 100)
+        bonus4 = random.randrange(1, 100)
+        bonus5 = random.randrange(1, 100)
+
+        bonus_tuple = (bonus1, bonus2, bonus3, bonus4, bonus5)
+        if 1 <= bonus_tuple[i] <= 50:
+            return 2
+        if 50 <= bonus_tuple[i] <= 100:
+            return 1.2
+
+
+'''Load set 1(cho map1)'''
 w11_name = ["w110", "w111", "w112", "w113", "w114", "w115", "w116", "w117", "w118", "w119", "w1110", "w1111", "w1112",
             "w1113", "w1114", "w1115", "w1116", "w1117", ]
 w11_loca = ["set01\PNG1 Sequences\Walking\w110.png",
@@ -256,6 +318,7 @@ for i in range(0, 18):
     w15_name[i] = pygame.image.load(w15_loca[i])
     w15_name[i] = pygame.transform.scale(w15_name[i], (140, 140))
 
+'''Load set 2 (cho map2)'''
 w21_name = ["w210", "w211", "w212", "w213", "w214", "w215", "w216", "w217", "w218", "w219", "w2110", "w2111"]
 
 w21_loca = ["set02\PNG1 Sequences\Walking\w210.png",
@@ -350,6 +413,7 @@ for i in range(0, 12):
     w25_name[i] = pygame.image.load(w25_loca[i])
     w25_name[i] = pygame.transform.scale(w25_name[i], (140, 140))
 
+'''Load set 4 (cho map2)'''
 w41_name = ["w410", "w411", "w412", "w413", "w414", "w415", "w416", "w417", "w418", "w419", "w4110", "w4111", "w4112",
             "w4113", "w4114", "w4115", "w4116", "w4117", ]
 w41_loca = ["set04\PNG1 Sequences\Walking\w410.png",
@@ -472,6 +536,7 @@ for i in range(0, 18):
     w45_name[i] = pygame.image.load(w45_loca[i])
     w45_name[i] = pygame.transform.scale(w45_name[i], (140, 140))
 
+'''Load set 5 (cho map2)'''
 w51_name = ["w5101", "w5102", "w5103", "w5104", "w5105", "w5106", "w5107", "w5108", "w5109", "w5110", "w5111", "w5112",
             "w5113", "w5114", "w5115", "w5116", "w5117", "w518"]
 w51_loca = [
@@ -593,101 +658,162 @@ w55_loca = [
 for i in range(0, 18):
     w55_name[i] = pygame.image.load(w55_loca[i])
     w55_name[i] = pygame.transform.scale(w55_name[i], (120, 120))
-# Load backgrounds
+
+# Background
+
+'''menu chính'''
 bgvn = pygame.image.load("background\menugame.png")
 bg = pygame.image.load("background\menugamevn.png")
+background = Background(bg)
+backgroundvn = Background(bgvn)
 
+'''màn hình chọn nhân vật'''
 bg0 = pygame.image.load("background\menugamemap.png")
+background0 = Background(bg0)
 
+'''các level của map1'''
 bg1 = pygame.image.load("background\\1.jpg")
 bg1_lv2 = pygame.image.load("background\\1.2.jpg")
 bg1_lv3 = pygame.image.load("background\\1.3.jpg")
-
-bg2 = pygame.image.load("background\\2.jpg")
-bg2_lv2 = pygame.image.load("background\\2.2.jpg")
-bg2_lv3 = pygame.image.load("background\\2.3.jpg")
-
-bg3 = pygame.image.load("background\\3.jpg")
-bg3_lv2 = pygame.image.load("background\\3.2.jpg")
-bg3_lv3 = pygame.image.load("background\\3.3.jpg")
-
-result = pygame.image.load("background\\result.png")
-rule_bg = pygame.image.load("background\\rulebg.png")
-
-# Set background
-background = Background(bg)
-backgroundvn = Background(bgvn)
-background0 = Background(bg0)
 background1 = Background(bg1_lv2)
 background1_lv2 = Background(bg1_lv2)
 background1_lv3 = Background(bg1_lv3)
+'''các level của map2'''
+bg2 = pygame.image.load("background\\2.jpg")
+bg2_lv2 = pygame.image.load("background\\2.2.jpg")
+bg2_lv3 = pygame.image.load("background\\2.3.jpg")
 background2 = Background(bg2)
 background2_lv2 = Background(bg2_lv2)
 background2_lv3 = Background(bg2_lv3)
+
+'''các level của map3'''
+bg3 = pygame.image.load("background\\3.jpg")
+bg3_lv2 = pygame.image.load("background\\3.2.jpg")
+bg3_lv3 = pygame.image.load("background\\3.3.jpg")
 background3 = Background(bg3)
 background3_lv2 = Background(bg3_lv2)
 background3_lv3 = Background(bg3_lv3)
-
+'''kết quả'''
+result = pygame.image.load("background\\result.png")
 background6 = Background(result)
+
+'''luật chơi'''
+rule_bg = pygame.image.load("background\\rulebg.png")
 background7 = Background(rule_bg)
 
 # Load button
+'''nút play'''
 play = pygame.image.load("Button\play1.png")
+play_but = Button(play, 100, 700, 105, 85)
+
 choose1 = pygame.image.load("Button\set_but1.png")
 choose1vn = pygame.image.load("Button\set_but1vn.png")
+
 choose2 = pygame.image.load("Button\set_but2.png")
 choose2vn = pygame.image.load("Button\set_but2vn.png")
+
 choose3 = pygame.image.load("Button\set_but3.png")
 choose3vn = pygame.image.load("Button\set_but3vn.png")
-choose4 = pygame.image.load("Button\set_but4.png")
-choose4vn = pygame.image.load("Button\set_but4vn.png")
-choose5 = pygame.image.load("Button\set_but5.png")
-choose5vn = pygame.image.load("Button\set_but5vn.png")
+set1vn_but = Button(choose1vn, set_but_x, set_but_y, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
+set2vn_but = Button(choose2vn, set_but_x, set_but_y + set_but_dis, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
+set3vn_but = Button(choose3vn, set_but_x, set_but_y + 2 * set_but_dis, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
+
+set1_but = Button(choose1, set_but_x, set_but_y, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
+set2_but = Button(choose2, set_but_x, set_but_y + set_but_dis, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
+set3_but = Button(choose3, set_but_x, set_but_y + 2 * set_but_dis, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
+
 exit = pygame.image.load("Button\exit.png")
+exit_but = Button(exit, exit_but_x, exit_but_y, exit_w, exit_h)
+
 signup = pygame.image.load("Button\signup.png")
 signupvn = pygame.image.load("Button/signupvn.png")
 login = pygame.image.load("Button\login.png")
 loginvn = pygame.image.load("Button\loginvn.png")
-setting = pygame.image.load("Button\setting.png")
 logout = pygame.image.load("Button\logout.png")
 logoutvn = pygame.image.load("Button\logoutvn.png")
+signup_but = Button(signup, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 1.3, 250, 130)
+login_but = Button(login, SCREEN_WIDTH // 2.8, SCREEN_HEIGHT // 1.3, 250, 130)
+signupvn_but = Button(signupvn, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 1.3, 250, 130)
+logout_but = Button(logout, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
+loginvn_but = Button(loginvn, SCREEN_WIDTH // 2.8, SCREEN_HEIGHT // 1.3, 250, 130)
+logoutvn_but = Button(logoutvn, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
+
+setting = pygame.image.load("Button\setting.png")
+setting_but = Button(setting, SCREEN_WIDTH // 1.025, SCREEN_HEIGHT // 17, SCREEN_WIDTH // 20, SCREEN_HEIGHT // 12)
+
 language = pygame.image.load("Button\language.png")
 languagevn = pygame.image.load("Button\languagevn.png")
 vie = pygame.image.load("Button\\vie.png")
 eng = pygame.image.load("Button\eng.png")
+language_but = Button(language, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.5, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
+languagevn_but = Button(languagevn, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.5, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
+vie_but = Button(vie, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 2, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
+eng_but = Button(eng, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 1.5, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
+
 box = pygame.image.load("Button\\box.png")
+
 car1 = pygame.image.load("setbg3\set03\car1.png")
 car2 = pygame.image.load("setbg3\set03\car2.png")
 car3 = pygame.image.load("setbg3\set03\car3.png")
 car4 = pygame.image.load("setbg3\set03\car4.png")
 car5 = pygame.image.load("setbg3\set03\car5.png")
 plane = pygame.image.load("setbg3\set03\plane.png")
+
 banhxe = pygame.image.load("setbg3\set03\\banhxe2.png")
+
 start = pygame.image.load("start\start.png")
 startvn = pygame.image.load("start\startvn.png")
+start_but = Button(start, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+startvn_but = Button(startvn, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+
 three = pygame.image.load("start\\3.png")
 two = pygame.image.load("start\\2.png")
 one = pygame.image.load("start\\1.png")
+three_but = Button(three, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+two_but = Button(two, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+one_but = Button(one, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+
 choose_set1 = pygame.image.load("Button\set1.png")
 choose_set1vn = pygame.image.load("Button\set1vn.png")
 choose_set2 = pygame.image.load("Button\set2.png")
 choose_set2vn = pygame.image.load("Button\set2vn.png")
+choose_set1_but = Button(choose_set1, SCREEN_WIDTH // 2, 50, 250, 130)
+choose_set1vn_but = Button(choose_set1vn, SCREEN_WIDTH // 2, 50, 250, 130)
+choose_set2_but = Button(choose_set2, SCREEN_WIDTH // 5, 50, 250, 130)
+choose_set2vn_but = Button(choose_set1vn, SCREEN_WIDTH // 5, 50, 250, 130)
+
 boom = pygame.image.load("hieuung\\boom.png")
 wind = pygame.image.load("hieuung\gio.png")
+
 minigame = pygame.image.load("Button\minigame.png")
+minigame_but = Button(minigame, 300, 712, 160, 60)
+
 snake = pygame.image.load("Button\snake.png")
 fruit = pygame.image.load("Button\\fruit.png")
 flappy_bird = pygame.image.load("Button\\bird.png")
+flappy_bird_but = Button(flappy_bird, 200, 600, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 15)
+fruit_but = Button(fruit, 660, 600, SCREEN_WIDTH // 10, SCREEN_HEIGHT // 15)
+snake_but = Button(snake, 1100, 600, SCREEN_WIDTH // 10, SCREEN_HEIGHT // 15)
+
 rule = pygame.image.load("Button\\rule.png")
 rule_info = pygame.image.load("Button\\rules.png")
-coin_img = pygame.image.load("Button/coin.png")
 rule_info = pygame.transform.scale(rule_info, (1920 / 2, 1080 / 2))
+rule_but = Button(rule, 500, 712, 100, 55)
+
+coin_img = pygame.image.load("Button/coin.png")
+coin_but = Button(coin_img, 1230, 18, 50, 50)
+
+demo_map1_but = Button(bg1, demomap_x, demomap_y, demomap_w, demomap_h)
+demo_map2_but = Button(bg2, demomap_x, demomap_y, demomap_w, demomap_h)
+demo_map3_but = Button(bg3, demomap_x, demomap_y, demomap_w, demomap_h)
+
 # Head
 head11 = pygame.image.load("head/Dau nv/Set1/PNG1.png")
 head12 = pygame.image.load("head/Dau nv/Set1/PNG2.png")
 head13 = pygame.image.load("head/Dau nv/Set1/PNG3.png")
 head14 = pygame.image.load("head/Dau nv/Set1/PNG4.png")
 head15 = pygame.image.load("head/Dau nv/Set1/PNG5.png")
+
 '''
 head11=pygame.transform.scale(head11,(210,210))
 head12=pygame.transform.scale(head12,(280,280))
@@ -719,75 +845,6 @@ head53 = pygame.image.load("head/Dau nv/Set5/nv3.png")
 head54 = pygame.image.load("head/Dau nv/Set5/nv4.png")
 head55 = pygame.image.load("head/Dau nv/Set5/nv5.png")
 
-# result picture
-# r11=pygame.image.load("")
-#################################
-
-##################
-# Set button
-play_but = Button(play, 100, 700, 105, 85)
-minigame_but = Button(minigame, 300, 712, 160, 60)
-rule_but = Button(rule, 500, 712, 100, 55)
-flappy_bird_but = Button(flappy_bird, 200, 600, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 15)
-fruit_but = Button(fruit, 660, 600, SCREEN_WIDTH // 10, SCREEN_HEIGHT // 15)
-snake_but = Button(snake, 1100, 600, SCREEN_WIDTH // 10, SCREEN_HEIGHT // 15)
-
-set1_but = Button(choose1, set_but_x, set_but_y, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
-set2_but = Button(choose2, set_but_x, set_but_y + set_but_dis, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
-set3_but = Button(choose3, set_but_x, set_but_y + 2 * set_but_dis, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
-
-exit_but = Button(exit, exit_but_x, exit_but_y, exit_w, exit_h)
-
-demo_map1_but = Button(bg1, demomap_x, demomap_y, demomap_w, demomap_h)
-demo_map2_but = Button(bg2, demomap_x, demomap_y, demomap_w, demomap_h)
-demo_map3_but = Button(bg3, demomap_x, demomap_y, demomap_w, demomap_h)
-
-signup_but = Button(signup, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 1.3, 250, 130)
-
-login_but = Button(login, SCREEN_WIDTH // 2.8, SCREEN_HEIGHT // 1.3, 250, 130)
-
-setting_but = Button(setting, SCREEN_WIDTH // 1.025, SCREEN_HEIGHT // 17, SCREEN_WIDTH // 20, SCREEN_HEIGHT // 12)
-
-logout_but = Button(logout, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
-
-language_but = Button(language, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.5, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
-
-set1vn_but = Button(choose1vn, set_but_x, set_but_y, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
-set2vn_but = Button(choose2vn, set_but_x, set_but_y + set_but_dis, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
-set3vn_but = Button(choose3vn, set_but_x, set_but_y + 2 * set_but_dis, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 4)
-
-signupvn_but = Button(signupvn, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 1.3, 250, 130)
-
-loginvn_but = Button(loginvn, SCREEN_WIDTH // 2.8, SCREEN_HEIGHT // 1.3, 250, 130)
-
-logoutvn_but = Button(logoutvn, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
-
-languagevn_but = Button(languagevn, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.5, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
-
-vie_but = Button(vie, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 2, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
-
-eng_but = Button(eng, SCREEN_WIDTH // 5, SCREEN_HEIGHT // 1.5, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4)
-
-start_but = Button(start, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-startvn_but = Button(startvn, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-
-three_but = Button(three, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-two_but = Button(two, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-one_but = Button(one, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-
-choose_set1_but = Button(choose_set1, SCREEN_WIDTH // 2, 50, 250, 130)
-choose_set1vn_but = Button(choose_set1vn, SCREEN_WIDTH // 2, 50, 250, 130)
-choose_set2_but = Button(choose_set2, SCREEN_WIDTH // 5, 50, 250, 130)
-choose_set2vn_but = Button(choose_set1vn, SCREEN_WIDTH // 5, 50, 250, 130)
-
-random_x1 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-random_x2 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-random_x3 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-random_x4 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-random_x5 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-
-coin_but = Button(coin_img, 1230, 18, 50, 50)
-
 # Set text
 chooseMap_text = Text(game_font1, "Choose the map", 255, 255, 255)
 chooseMapvn_text = Text(game_font1, "Chọn bản đồ", 255, 255, 255)
@@ -803,6 +860,7 @@ S_nv4 = Text(game_font2, str(int((w14_x) / 3)), 0, 0, 0)
 S_nv5 = Text(game_font2, str(int((w15_x) / 3)), 0, 0, 0)
 
 
+# Các hàm
 def check_press(rect, pos):
     if rect.collidepoint(pos):
         if pygame.mouse.get_pressed()[0] == 1:
@@ -820,6 +878,8 @@ def check_hover(rect, pos):
 
 coin_bool = False
 
+'''Tắt hết các màn hình còn lại'''
+
 
 def off_screen_except(x):
     global set_, wait, set1, set2, set3, setting_bool, result, lang, start_bool, minigame_bool, rule_bool, choosenv_bool1
@@ -829,54 +889,37 @@ def off_screen_except(x):
     set1 = False  # map1
     set2 = False  # map2
     set3 = False  # map3
-    result = False
+    result = False  # ket qua
     lang = False  # ngon ngu
     start_bool = False  # bat dau tran
-    setting_bool = False
-    minigame_bool = False
+    setting_bool = False  # setting
+    minigame_bool = False  # minigame
     rule_bool = False
-    flap = False
-    choosenv_bool1 = choosenv_bool2 = False
-    setnv11 = False
-    setnv21 = False
-    setnv12 = False
-    setnv22 = False
-    if x == 0:
-        set_ = True
-    if x == 1:
-        set1 = True
-    if x == 2:
-        set2 = True
-    if x == 3:
-        set3 = True
-    if x == 4:
-        set4 = True
-    if x == 5:
-        set5 = True
-    if x == 6:
-        setting_bool = True
-    if x == 7:
-        lang = True
-    if x == 8:
-        result = True
-    if x == 9:
-        start_bool = True
-    if x == 10:
-        minigame_bool = True
-    if x == 11:
-        rule_bool = True
-    if x == 12:
-        choosenv_bool1 = True
-    if x == 13:
-        setnv12 = True
-    if x == 14:
-        setnv22 = True
-    if x == 15:
-        choosenv_bool2 = True
-    if x == 16:
-        flap = True
-    if x == 0.5:
-        wait = True
+    flap = False  # game flappy bird
+    choosenv_bool1 = choosenv_bool2 = False  # chon set truoc khi vao
+    setnv11 = False  # set 1 của map1
+    setnv21 = False  # set 2 của map1
+    setnv12 = False  # set 1 của map2
+    setnv22 = False  # set 2 của map2
+
+    if x == 0: set_ = True
+    if x == 1: set1 = True
+    if x == 2: set2 = True
+    if x == 3: set3 = True
+    if x == 4: set4 = True  # đã bỏ không xài
+    if x == 5: set5 = True  # đã bỏ không xài
+    if x == 6: setting_bool = True
+    if x == 7: lang = True
+    if x == 8: result = True
+    if x == 9: start_bool = True
+    if x == 10: minigame_bool = True
+    if x == 11: rule_bool = True
+    if x == 12: choosenv_bool1 = True
+    if x == 13: setnv12 = True
+    if x == 14: setnv22 = True
+    if x == 15: choosenv_bool2 = True
+    if x == 16: flap = True
+    if x == 0.5: wait = True
 
 
 def language_screen():
@@ -975,172 +1018,6 @@ def menu_screen():
     random_x5 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 
 
-class Flappy_bird:
-    def __init__(self):
-        self.gravity = 0.1
-        self.bird_movement = 0
-        self.game_active = False
-
-        # kiểm tra đã đổi kích thước screen chưa
-        self.check_change_screen = False
-
-        # chen BG va floor
-        self.bg = pygame.transform.scale(pygame.image.load(r'Flappy_Bird\assets\background-night.png'), (500, 768))
-        self.floor = pygame.transform.scale2x(pygame.image.load(r'Flappy_Bird\assets\floor.png'))
-        self.floor_x = 0
-
-        # kieu chu
-        self.game_font = pygame.font.Font(r'Flappy_Bird\04B_19.TTF', 40)
-
-        # bang diem
-        self.score = 0
-        self.high_score = 0
-
-        # tao chim
-        self.bird_down = pygame.transform.scale2x(pygame.image.load(r'Flappy_Bird\assets\yellowbird-downflap.png'))
-        self.bird_up = pygame.transform.scale2x(pygame.image.load(r'Flappy_Bird\assets\yellowbird-upflap.png'))
-        self.bird_mid = pygame.transform.scale2x(pygame.image.load(r'Flappy_Bird\assets\yellowbird-midflap.png'))
-        self.bird_list = [self.bird_up, self.bird_mid, self.bird_down]
-        self.bird_rect = self.bird_mid.get_rect(center=(100, 384))
-        self.bird_index = 0
-
-        # tao pipe
-        self.pipe_surface = pygame.transform.scale2x(pygame.image.load(r'Flappy_Bird\assets\pipe-green.png'))
-        self.pipe_list = []
-        self.pipe_height = [200, 250, 300, 350, 400]
-
-        # tao timer
-        self.spawnpipe = pygame.USEREVENT
-        pygame.time.set_timer(self.spawnpipe, 1200)
-
-        # gameover
-        self.game_over = pygame.image.load(r'Flappy_Bird\assets\begin.png')
-        self.game_over_rect = self.game_over.get_rect(center=(250, 384))
-
-        # chem am thanh
-        self.flap_sound = pygame.mixer.Sound(r'Flappy_Bird\sound\sfx_wing.wav')
-        self.hit_sound = pygame.mixer.Sound(r'Flappy_Bird\sound\sfx_die.wav')
-        self.score_sound = pygame.mixer.Sound(r'Flappy_Bird\sound\sfx_point.wav')
-
-        # nút exit
-        self.exit_button = self.game_font.render('EXIT', True, (255, 255, 255))
-        self.exit_button_rect = self.exit_button.get_rect(topleft=(400, 700))
-
-    def draw_floor(self, screen2):
-        screen2.blit(self.floor, (self.floor_x, 600))
-        screen2.blit(self.floor, (self.floor_x + 432, 600))
-
-    def create_pipe(self):
-        random_pipe_pos = random.choice(self.pipe_height)
-        bottom_pipe = self.pipe_surface.get_rect(midtop=(700, random_pipe_pos))
-        top_pipe = self.pipe_surface.get_rect(midtop=(700, random_pipe_pos - 700))
-        self.pipe_list.extend((bottom_pipe, top_pipe))
-
-    def move_pipe(self):
-        if self.pipe_list is not None:
-            for pipe in self.pipe_list:
-                pipe.centerx -= 5
-
-    def draw_pipe(self, screen2):
-        for pipe in self.pipe_list:
-            if pipe.bottom >= 600:
-                screen2.blit(self.pipe_surface, pipe)
-            else:
-                flip_pipe = pygame.transform.flip(self.pipe_surface, False, True)
-                screen2.blit(flip_pipe, pipe)
-
-    def check_collision(self):
-        for pipe in self.pipe_list:
-            if self.bird_rect.colliderect(pipe) or self.bird_rect.bottom >= 650 or self.bird_rect.top <= 0:
-                self.hit_sound.play()
-                return False
-        return True
-
-    def rotate_bird(self, bird):
-        new_bird = pygame.transform.rotozoom(bird, self.bird_movement * -3, 1)
-        return new_bird
-
-    def score_display(self, screen2):
-        score_surface = self.game_font.render(str(self.score), True, (255, 255, 255))
-        score_rect = score_surface.get_rect(center=(300, 50))
-        screen2.blit(score_surface, score_rect)
-
-        score_surface_1 = self.game_font.render('Score :', True, (255, 255, 255))
-        score_rect.center = (140, 50)
-        screen2.blit(score_surface_1, score_rect)
-
-        if self.game_active == False:
-            high_score_surface = self.game_font.render(str(self.high_score), True, (255, 255, 255))
-            score_rect.center = (340, 700)
-            screen2.blit(high_score_surface, score_rect)
-
-            high_score_surface_1 = self.game_font.render('High score :', True, (255, 255, 255))
-            score_rect.center = (80, 700)
-            screen2.blit(high_score_surface_1, score_rect)
-
-    def Flappy_bird_game(self, screen2):
-        clock.tick(60)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and self.game_active == True:
-                    self.bird_movement = -5
-                    self.flap_sound.play()
-                if event.key == pygame.K_SPACE and self.game_active == False:
-                    self.game_active = True
-                    self.bird_movement = 0
-                    self.bird_rect.center = (100, 384)
-                    self.score = 0
-            if event.type == self.spawnpipe:
-                if (len(self.pipe_list) != 0):
-                    self.score += 1
-                    self.score_sound.play()
-                self.create_pipe()
-            if event.type == pygame.MOUSEBUTTONUP:
-                pos = pygame.mouse.get_pos()
-                if self.exit_button_rect.collidepoint(pos):
-                    self.exit_game(screen2)
-
-        screen2.blit(self.bg, (0, 0))
-
-        if self.game_active:
-            # chim
-            self.bird_index += 1
-            self.bird_index %= 42
-            bird = self.bird_list[int(self.bird_index / 14)]
-            self.bird_movement += self.gravity
-            self.bird_rect.centery += self.bird_movement
-            screen2.blit(self.rotate_bird(bird), self.bird_rect)
-            self.game_active = self.check_collision()
-
-            # ong
-            self.move_pipe()
-            self.draw_pipe(screen2)
-        else:
-            screen2.blit(self.game_over, self.game_over_rect)
-            if self.pipe_list is not None:
-                self.pipe_list.clear()
-            self.high_score = max(self.high_score, self.score)
-        # san
-        self.floor_x -= 1
-        if (self.floor_x == -432):
-            self.floor_x = 0
-        self.draw_floor(screen2)
-
-        # bang diem
-        self.score_display(screen2)
-
-        screen2.blit(self.exit_button, self.exit_button_rect)
-
-    def exit_game(self, screen2):
-        global bird_game
-        screen2 = pygame.display.set_mode((1000, 800))
-        self.check_change_screen = False
-        bird_game = False
-
-
 def minigame_screen():
     off_screen_except(10)
     background0.draw_bg(screen)
@@ -1149,12 +1026,13 @@ def minigame_screen():
     flappy_bird_but.draw_but(screen)
 
     if check_press(flappy_bird_but.image_rect, pos):
-        subprocess.run(["python","PlappyBird.py"])
+        #subprocess.run(["python", "PlappyBird.py"])
+        pass
 
     if check_press(snake_but.image_rect, pos):
-        import Snake_game.Picture.Snake_game_class
+        pass #bỏ đoạn code các minigame vào
     if check_press(fruit_but.image_rect, pos):
-        import Chem_Chuoi.Fruit_ninja
+        pass
     exit_but.draw_but(screen)
     if check_press(exit_but.image_rect, pos):
         off_screen_except(0)
@@ -1222,12 +1100,14 @@ def wait_screen():
     wi13 = 0
     wi14 = 0
     wi15 = 0
+
     global x1, x2, x3, x4, x5
     x1 = random.uniform(0.8, 1.2)
     x2 = random.uniform(0.8, 1.2)
     x3 = random.uniform(0.8, 1.2)
     x4 = random.uniform(0.8, 1.2)
     x5 = random.uniform(0.8, 1.2)
+
     global lucky1, lucky2, lucky3, lucky4, lucky5
     lucky1 = random.randrange(1, 100)
     lucky2 = random.randrange(1, 100)
@@ -1256,7 +1136,7 @@ def setting_screen():
         language_screen()
 
 
-bet =""
+bet = ""
 
 
 def choose_nv_screen1():
@@ -1339,6 +1219,7 @@ def choose_nv_screen2():
     exit_but.draw_but(screen)
     if check_press(exit_but.image_rect, pos):
         off_screen_except(0.5)
+
 
 box_but1 = Button(box, random_x1, 235, 50, 50)
 box_but2 = Button(box, random_x2, 350, 50, 50)
@@ -1478,8 +1359,6 @@ def map3(pos):
     box_but4 = Button(box, random_x4, 575, 50, 50)
     box_but5 = Button(box, random_x5, 675, 50, 50)
 
-
-
     if random_x1 > w11_x:
         box_but1.draw_but(screen)
     if random_x2 > w12_x:
@@ -1490,37 +1369,6 @@ def map3(pos):
         box_but4.draw_but(screen)
     if random_x5 > w15_x:
         box_but5.draw_but(screen)
-
-
-class nhanVat:
-    def __init__(self, name, img_array, x, y, w, h):
-        self.name = name
-        self.img_array = img_array
-        self.x = x
-        self.y = y
-        self.name = Button(img_array, x, y, w, h)
-
-    def draw_nv(self):
-        self.name.draw_but(screen)
-
-    def check_vc(self, sur):
-        if self.name.image_rect.colliderect(sur.image_rect):
-            return True
-        else:
-            return False
-
-    def buff_speed(self, i):
-        bonus1 = random.randrange(1, 100)
-        bonus2 = random.randrange(1, 100)
-        bonus3 = random.randrange(1, 100)
-        bonus4 = random.randrange(1, 100)
-        bonus5 = random.randrange(1, 100)
-
-        bonus_tuple = (bonus1, bonus2, bonus3, bonus4, bonus5)
-        if 1 <= bonus_tuple[i] <= 50:
-            return 2
-        if 50 <= bonus_tuple[i] <= 100:
-            return 1.2
 
 
 i = 1
@@ -1908,8 +1756,6 @@ while True:
     if choosenv_bool2:
         choose_nv_screen2()
     if flap:
-        screen2 = pygame.display.set_mode((500, 768))
-        f = Flappy_bird()
-        f.Flappy_bird_game(screen)
+        pass
     pygame.display.update()
     clock.tick(60)
