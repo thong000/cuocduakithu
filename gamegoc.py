@@ -7,6 +7,7 @@ import Fruit_ninja
 import PlappyBird
 import Snake_game_class
 import store_func
+import Rule
 
 pygame.init()
 
@@ -26,9 +27,13 @@ with open('log.txt', 'r') as file:
     if content == "0":
         lock = False
 
+with open('coin.txt','r') as c:
+    global coin
+    coin=int(c.read())
+
 # Thông số cơ bản
 
-coin = 0
+
 speed = 5
 
 SCREEN_WIDTH = 1344
@@ -94,11 +99,11 @@ pygame.display.set_icon(pygame.image.load("SPEED RACE.png"))
 # fruit=Fruit_ninja.Fruit_ninja()
 
 # vị trí của nhân vật và các chỉ số chạy mảng
-w11_x = 0
-w12_x = 0
-w13_x = 0
-w14_x = 0
-w15_x = 0
+w11_x = -400
+w12_x = -400
+w13_x = -400
+w14_x = -400
+w15_x = -400
 wi11 = 0
 wi12 = 0
 wi13 = 0
@@ -118,6 +123,16 @@ game_font2 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 25)
 game_font3 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 70)
 game_font4 = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 80)
 game_font_mini = pygame.font.Font("font/DVN-Fredoka-Bold.ttf", 10)
+
+# luat
+rule_page = 0
+rule_time = 0
+
+#buff
+buff = 0
+
+#finish game
+game_finish = 0
 
 '''Background full màn hình'''
 
@@ -687,7 +702,7 @@ background0 = Background(bg0)
 bg1 = pygame.image.load("background\\1.jpg")
 bg1_lv2 = pygame.image.load("background\\1.2.jpg")
 bg1_lv3 = pygame.image.load("background\\1.3.jpg")
-background1 = Background(bg1_lv2)
+background1 = Background(bg1)
 background1_lv2 = Background(bg1_lv2)
 background1_lv3 = Background(bg1_lv3)
 '''các level của map2'''
@@ -772,18 +787,6 @@ car5 = pygame.image.load("setbg3\set03\car5.png")
 plane = pygame.image.load("setbg3\set03\plane.png")
 
 banhxe = pygame.image.load("setbg3\set03\\banhxe2.png")
-
-start = pygame.image.load("start\start.png")
-startvn = pygame.image.load("start\startvn.png")
-start_but = Button(start, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-startvn_but = Button(startvn, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-
-three = pygame.image.load("start\\3.png")
-two = pygame.image.load("start\\2.png")
-one = pygame.image.load("start\\1.png")
-three_but = Button(three, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-two_but = Button(two, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-one_but = Button(one, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
 
 choose_set1 = pygame.image.load("Button\set1.png")
 choose_set1vn = pygame.image.load("Button\set1vn.png")
@@ -1054,6 +1057,8 @@ def account_login():
 
 
 def menu_screen():
+    global get_coin
+    get_coin=False
     if set_ and lock == False:
         account_login()
     if lock:
@@ -1075,7 +1080,6 @@ def menu_screen():
             off_screen_except(10)
             minigame_screen()
         if check_press(rule_but.image_rect, pos):
-            rule_screen()
             off_screen_except(11)
 
 
@@ -1092,11 +1096,11 @@ def menu_screen():
         setting_but.draw_but(screen)
 
     global w11_x, w12_x, w13_x, w14_x, w15_x, wi11, wi12, wi13, wi14, wi15
-    w11_x = 0
-    w12_x = 0
-    w13_x = 0
-    w14_x = 0
-    w15_x = 0
+    w11_x = -350
+    w12_x = -350
+    w13_x = -350
+    w14_x = -350
+    w15_x = -350
     wi11 = 0
     wi12 = 0
     wi13 = 0
@@ -1192,11 +1196,11 @@ def wait_screen():
         off_screen_except(0)
 
     global w11_x, w12_x, w13_x, w14_x, w15_x, wi11, wi12, wi13, wi14, wi15
-    w11_x = 0
-    w12_x = 0
-    w13_x = 0
-    w14_x = 0
-    w15_x = 0
+    w11_x = -350
+    w12_x = -350
+    w13_x = -350
+    w14_x = -350
+    w15_x = -350
     wi11 = 0
     wi12 = 0
     wi13 = 0
@@ -1243,6 +1247,31 @@ bet = ""
 
 global nv
 nv = 0
+start_img = pygame.image.load("start/start.png")
+start_but = Button(start_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+
+
+def start_screen(lan):
+    global start_but
+    if lan:
+        start_img = pygame.image.load("start/start.png")
+        start_but = Button(start_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+
+    else:
+        start_img = pygame.image.load("start/startvn.png")
+        start_but = Button(start_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+    three_img = pygame.image.load("start/3.png")
+    two_img = pygame.image.load("start/2.png")
+    one_img = pygame.image.load("start/1.png")
+
+    three_but = Button(three_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+    two_but = Button(two_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+    one_but = Button(one_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+
+    start_but.draw_but(screen)
+    three_but.draw_but(screen)
+    two_but.draw_but(screen)
+    one_but.draw_but(screen)
 
 
 def choose_nv_screen1():
@@ -1311,16 +1340,23 @@ def choose_nv_screen1():
         Nv45_but.draw_but(screen)
 
     if not s1_active:
+        global finish
+        finish = 1080
         Size1.draw_text(screen, 200, 600)
     else:
+        finish = 1030
         size1_active.draw_text(screen, 200, 600)
     if not s2_active:
+        finish = 980
         Size2.draw_text(screen, 100, 600)
+        global background1
+        background1 = background1_lv2
     else:
         size2_active.draw_text(screen, 100, 600)
     if not s3_active:
         Size3.draw_text(screen, 0, 600)
     else:
+        background1 = background1_lv3
         size3_active.draw_text(screen, 0, 600)
 
     for event in pygame.event.get():
@@ -1370,11 +1406,26 @@ def choose_nv_screen1():
         next_but.draw_but(screen)
         if check_press(next_but.image_rect, pos):
             if setnv11:
+                global box_active1, box_active2, box_active3, box_active4, box_active5
+                box_active1 = box_active2 = box_active3 = box_active4 = box_active5 = 0
+                global time_limit, start_time
+                global three_limit, two_limit, one_limit
+                three_limit = 1000
+                two_limit = 2000
+                one_limit = 3000
+                time_limit = 4000
+                start_time = pygame.time.get_ticks()
                 off_screen_except(1)
                 setnv11 = True
             if setnv21:
+                three_limit = 1000
+                two_limit = 2000
+                one_limit = 3000
+                time_limit = 4000
+                start_time = pygame.time.get_ticks()
                 off_screen_except(1)
                 setnv21 = True
+
 
 global nv2
 nv2 = 0
@@ -1499,15 +1550,30 @@ def choose_nv_screen2():
         next_but.draw_but(screen)
         if check_press(next_but.image_rect, pos):
             if setnv12:
+                global time_limit, start_time
+                global three_limit, two_limit, one_limit
+                three_limit = 1000
+                two_limit = 2000
+                one_limit = 3000
+                time_limit = 4000
+                start_time = pygame.time.get_ticks()
                 off_screen_except(2)
                 setnv12 = True
             if setnv22:
+                three_limit = 1000
+                two_limit = 2000
+                one_limit = 3000
+                time_limit = 4000
+                start_time = pygame.time.get_ticks()
                 off_screen_except(2)
                 setnv22 = True
 
-nv3=0
+
+nv3 = 0
+
+
 def choose_nv_screen3():
-    global s1_active, s2_active, s3_active, bet,nv3
+    global s1_active, s2_active, s3_active, bet, nv3
 
     background0.draw_bg(screen)
     choosenv.draw_text(screen, 300, 10)
@@ -1521,7 +1587,7 @@ def choose_nv_screen3():
     if check_press(Nv32_but.image_rect, pos):
         nv3 = 2
     if check_press(Nv33_but.image_rect, pos):
-        nv3= 3
+        nv3 = 3
     if check_press(Nv34_but.image_rect, pos):
         nv3 = 4
     if check_press(Nv35_but.image_rect, pos):
@@ -1601,7 +1667,7 @@ s2_active = s3_active = False
 
 nv1_choosed = nv2_choosed = nv3_choosed = nv4_choosed = nv5_choosed = False
 
-box_but1 = Button(box, random_x1, 235, 50, 50)
+box_but1 = Button(box, random_x1, 235, 30, 30)
 box_but2 = Button(box, random_x2, 350, 50, 50)
 box_but3 = Button(box, random_x3, 460, 50, 50)
 box_but4 = Button(box, random_x4, 575, 50, 50)
@@ -1804,15 +1870,41 @@ def map3(pos):
     head35_but.draw_but(screen)
 
 
-'''def chooselv():'''
-
-coin = 100
 
 clock = pygame.time.Clock()
+three_limit = 1000  # milliseconds (5 seconds)
+start_time = pygame.time.get_ticks()
+two_limit = 2000
+one_limit = 3000
+time_limit = 4000
+
+start_img = pygame.image.load("start/start.png")
+start_but = Button(start_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 350, 250)
+
+startvn_img = pygame.image.load("start/startvn.png")
+start_butvn = Button(startvn_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 350, 250)
+three_img = pygame.image.load("start/3.png")
+two_img = pygame.image.load("start/2.png")
+one_img = pygame.image.load("start/1.png")
+
+three_but = Button(three_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+two_but = Button(two_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+one_but = Button(one_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+
+start_but.draw_but(screen)
+three_but.draw_but(screen)
+two_but.draw_but(screen)
+one_but.draw_but(screen)
+list_nv_win = [0, 0, 0, 0, 0]
+list_ranking = []
+list_stt = []
+shop = store_func.Store(lan, 1344, 768)
+get_coin=False
 while True:
 
     global pos
     pos = pygame.mouse.get_pos()
+    # print(pos)
 
     S_nv1 = Text(game_font2, str(int(w11_x / 5)), 0, 0, 0)
     S_nv2 = Text(game_font2, str(int(w12_x / 5)), 0, 0, 0, )
@@ -1871,8 +1963,12 @@ while True:
         store = Button(store_img, 1200, 650, 200, 200)
         store.draw_but(screen)
         if check_press(store.image_rect, pos):
-            shop = store_func.Store(lan, 1344, 768)
-            shop.running(screen, coin, 1344, 768)
+            if game_finish == 1:
+                shop.buy1 = True
+                shop.buy2 = True
+                shop.buy3 = True
+                game_finish = 0
+            buff, coin = shop.running(screen, coin, 1344, 768)
         coin_but.draw_but(screen)
         coin_text = Text(game_font1, str(coin), 255, 200, 60)
         coin_text.draw_text(screen, 1130, -6)
@@ -1883,264 +1979,355 @@ while True:
     if setting_bool:
         setting_screen()
     if set2:
-        map2(pos)
-        if check_press(exit_but.image_rect, pos):
-            off_screen_except(0.5)
-            time.sleep(0.2)
-        if setnv12:
-            nv21 = nhanVat("nv21", w21_name[int(wi12)], w11_x, 200, 120, 120)
-            nv21.draw_nv()
-            if nv21.check_vc(box_but1):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x1 = nv21.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w11_x = finish
-
-            nv22 = nhanVat("nv22", w22_name[int(wi12)], w12_x, 325, 120, 120)
-            nv22.draw_nv()
-            if nv22.check_vc(box_but2):
-                i = 1
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x2 = nv22.buff_speed(0)
-                if 50 < lucky <= 100 and i == 1:
-                    w12_x = finish
-                i += 1
-
-            nv23 = nhanVat("nv23", w23_name[int(wi12)], w13_x, 450, 120, 120)
-            nv23.draw_nv()
-            if nv23.check_vc(box_but3):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x3 = nv23.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w13_x = finish
-
-            nv24 = nhanVat("nv24", w24_name[int(wi12)], w14_x, 550, 120, 120)
-            nv24.draw_nv()
-            if nv24.check_vc(box_but4):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x4 = nv24.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w14_x = finish
-
-            nv25 = nhanVat("nv25", w25_name[int(wi12)], w15_x, 650, 120, 120)
-            nv25.draw_nv()
-            if nv25.check_vc(box_but5):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x5 = nv25.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w15_x = finish
-            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
-                off_screen_except(8)
-                background6.draw_bg(screen)
-                exit_but.draw_but(screen)
-                if check_press(exit_but.image_rect, pos):
-                    off_screen_except(0.5)
-        if setnv22:
-            nv51 = nhanVat("nv51", w51_name[int(wi15)], w11_x, 200, 100, 100)
-            nv51.draw_nv()
-            if nv51.check_vc(box_but1):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x1 = nv51.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w11_x = finish
-
-            nv52 = nhanVat("nv52", w52_name[int(wi15)], w12_x, 325, 100, 100)
-            nv52.draw_nv()
-            if nv52.check_vc(box_but2):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x2 = nv52.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w12_x = finish
-
-            nv53 = nhanVat("nv53", w53_name[int(wi15)], w13_x, 450, 100, 100)
-            nv53.draw_nv()
-            if nv53.check_vc(box_but3):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x3 = nv53.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w13_x = finish
-
-            nv54 = nhanVat("nv54", w54_name[int(wi15)], w14_x, 550, 100, 100)
-            nv54.draw_nv()
-            if nv54.check_vc(box_but4):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x4 = nv54.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w14_x = finish
-
-            nv55 = nhanVat("nv55", w55_name[int(wi15)], w15_x, 650, 100, 100)
-            nv55.draw_nv()
-            if nv55.check_vc(box_but5):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x5 = nv55.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w15_x = finish
-            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
-                off_screen_except(8)
-                background6.draw_bg(screen)
-                exit_but.draw_but(screen)
-                if check_press(exit_but.image_rect, pos):
-                    off_screen_except(0.5)
-        if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
-            off_screen_except(8)
-            background6.draw_bg(screen)
-            exit_but.draw_but(screen)
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - start_time
+        if elapsed_time < three_limit:
+            background2.draw_bg(screen)
+            three_but.draw_but(screen)
+        elif elapsed_time < two_limit:
+            background2.draw_bg(screen)
+            two_but.draw_but(screen)
+        elif elapsed_time < one_limit:
+            background2.draw_bg(screen)
+            one_but.draw_but(screen)
+        elif elapsed_time < time_limit:
+            background2.draw_bg(screen)
+            if lan:
+                start_but.draw_but(screen)
+            else:
+                start_butvn.draw_but(screen)
+        else:
+            if nv == 1:
+                x1 += x1 * 100 * buff
+            if nv == 2:
+                x2 = x2 * 100 * buff
+            if nv == 3:
+                x3 = x3 * 100 * buff
+            if nv == 4:
+                x4 = x4 * 100 * buff
+            if nv == 5:
+                x5 = x5 * 100 * buff
+            boom_but1 = Button(boom, box_but1.x, 225, 90, 90)
+            boom_but2 = Button(boom, box_but2.x, 345, 90, 90)
+            boom_but3 = Button(boom, box_but3.x, 470, 90, 90)
+            boom_but4 = Button(boom, box_but4.x, 570, 90, 90)
+            boom_but5 = Button(boom, box_but5.x, 660, 90, 90)
+            map2(pos)
             if check_press(exit_but.image_rect, pos):
                 off_screen_except(0.5)
+                time.sleep(0.2)
+            if setnv12:
+                nv21 = nhanVat("nv21", w21_name[int(wi12)], w11_x, 200, 120, 120)
+                nv21.draw_nv()
+                if nv21.check_vc(box_but1):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x1 = nv21.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w11_x = finish
+
+                nv22 = nhanVat("nv22", w22_name[int(wi12)], w12_x, 325, 120, 120)
+                nv22.draw_nv()
+                if nv22.check_vc(box_but2):
+                    i = 1
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x2 = nv22.buff_speed(0)
+                    if 50 < lucky <= 100 and i == 1:
+                        w12_x = finish
+                    i += 1
+
+                nv23 = nhanVat("nv23", w23_name[int(wi12)], w13_x, 450, 120, 120)
+                nv23.draw_nv()
+                if nv23.check_vc(box_but3):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x3 = nv23.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w13_x = finish
+
+                nv24 = nhanVat("nv24", w24_name[int(wi12)], w14_x, 550, 120, 120)
+                nv24.draw_nv()
+                if nv24.check_vc(box_but4):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x4 = nv24.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w14_x = finish
+
+                nv25 = nhanVat("nv25", w25_name[int(wi12)], w15_x, 650, 120, 120)
+                nv25.draw_nv()
+                if nv25.check_vc(box_but5):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x5 = nv25.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w15_x = finish
+                if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
+                    off_screen_except(8)
+                    background6.draw_bg(screen)
+                    exit_but.draw_but(screen)
+                    if check_press(exit_but.image_rect, pos):
+                        off_screen_except(0.5)
+            if setnv22:
+                nv51 = nhanVat("nv51", w51_name[int(wi15)], w11_x, 200, 100, 100)
+                nv51.draw_nv()
+                if nv51.check_vc(box_but1):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x1 = nv51.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w11_x = finish
+
+                nv52 = nhanVat("nv52", w52_name[int(wi15)], w12_x, 325, 100, 100)
+                nv52.draw_nv()
+                if nv52.check_vc(box_but2):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x2 = nv52.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w12_x = finish
+
+                nv53 = nhanVat("nv53", w53_name[int(wi15)], w13_x, 450, 100, 100)
+                nv53.draw_nv()
+                if nv53.check_vc(box_but3):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x3 = nv53.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w13_x = finish
+
+                nv54 = nhanVat("nv54", w54_name[int(wi15)], w14_x, 550, 100, 100)
+                nv54.draw_nv()
+                if nv54.check_vc(box_but4):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x4 = nv54.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w14_x = finish
+
+                nv55 = nhanVat("nv55", w55_name[int(wi15)], w15_x, 650, 100, 100)
+                nv55.draw_nv()
+                if nv55.check_vc(box_but5):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 50:
+                        x5 = nv55.buff_speed(0)
+                    if 50 < lucky <= 100:
+                        w15_x = finish
+                if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
+                    off_screen_except(8)
+                    background6.draw_bg(screen)
+                    exit_but.draw_but(screen)
+                    if check_press(exit_but.image_rect, pos):
+                        off_screen_except(0.5)
+            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
+                off_screen_except(8)
+                background6.draw_bg(screen)
+                exit_but.draw_but(screen)
+                if check_press(exit_but.image_rect, pos):
+                    off_screen_except(0.5)
     if set1:
-        boom_but1 = Button(boom, box_but1.x, 225, 90, 90)
-        boom_but2 = Button(boom, box_but2.x, 345, 90, 90)
-        boom_but3 = Button(boom, box_but3.x, 470, 90, 90)
-        boom_but4 = Button(boom, box_but4.x, 570, 90, 90)
-        boom_but5 = Button(boom, box_but5.x, 660, 90, 90)
-        map1(pos)
-        if check_press(exit_but.image_rect, pos):
-            off_screen_except(0.5)
-            time.sleep(0.2)
-        if setnv21:
-            nv41 = nhanVat("nv41", w41_name[int(wi14)], w11_x, 200, 120, 120)
-            nv41.draw_nv()
-            if nv41.check_vc(box_but1):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x1 = nv41.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w11_x = finish
 
-            nv42 = nhanVat("nv42", w42_name[int(wi14)], w12_x, 325, 120, 120)
-            nv42.draw_nv()
-            if nv42.check_vc(box_but2):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x2 = nv42.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w12_x = finish
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - start_time
+        if elapsed_time < three_limit:
+            background1.draw_bg(screen)
+            three_but.draw_but(screen)
+        elif elapsed_time < two_limit:
+            background1.draw_bg(screen)
+            two_but.draw_but(screen)
+        elif elapsed_time < one_limit:
+            background1.draw_bg(screen)
+            one_but.draw_but(screen)
+        elif elapsed_time < time_limit:
+            background1.draw_bg(screen)
+            if lan:
+                start_but.draw_but(screen)
+            else:
+                start_butvn.draw_but(screen)
+        else:
+            if nv == 1:
+                x1 += x1 * 100 * buff
+            if nv == 2:
+                x2 += x2 * 100 * buff
+            if nv == 3:
+                x3 += x3 * 100 * buff
+            if nv == 4:
+                x4 += x4 * 100 * buff
+            if nv == 5:
+                x5 += x5 * 100 * buff
+            boom_but1 = Button(boom, box_but1.x, 225, 90, 90)
+            boom_but2 = Button(boom, box_but2.x, 345, 90, 90)
+            boom_but3 = Button(boom, box_but3.x, 470, 90, 90)
+            boom_but4 = Button(boom, box_but4.x, 570, 90, 90)
+            boom_but5 = Button(boom, box_but5.x, 660, 90, 90)
+            map1(pos)
+            if check_press(exit_but.image_rect, pos):
+                off_screen_except(0.5)
+                time.sleep(0.2)
 
-            nv43 = nhanVat("nv43", w43_name[int(wi14)], w13_x, 450, 120, 120)
-            nv43.draw_nv()
-            if nv43.check_vc(box_but3):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x3 = nv43.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w13_x = finish
+            if setnv21:
+                nv41 = nhanVat("nv41", w41_name[int(wi14)], w11_x, 200, 120, 120)
+                nv41.draw_nv()
+                if nv41.check_vc(box_but1):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 90:
+                        x1 = nv41.buff_speed(0)
+                    if 9 < lucky <= 100:
+                        w11_x = finish
 
-            nv44 = nhanVat("nv44", w44_name[int(wi14)], w14_x, 550, 120, 120)
-            nv44.draw_nv()
-            if nv44.check_vc(box_but4):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x4 = nv44.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w14_x = finish
+                nv42 = nhanVat("nv42", w42_name[int(wi14)], w12_x, 325, 120, 120)
+                nv42.draw_nv()
+                if nv42.check_vc(box_but2):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 90:
+                        x2 = nv42.buff_speed(0)
+                    if 90 < lucky <= 100:
+                        w12_x = finish
 
-            nv45 = nhanVat("nv45", w45_name[int(wi14)], w15_x, 650, 120, 120)
-            nv45.draw_nv()
-            if nv45.check_vc(box_but5):
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 50:
-                    x5 = nv45.buff_speed(0)
-                if 50 < lucky <= 100:
-                    w15_x = finish
+                nv43 = nhanVat("nv43", w43_name[int(wi14)], w13_x, 450, 120, 120)
+                nv43.draw_nv()
+                if nv43.check_vc(box_but3):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 90:
+                        x3 = nv43.buff_speed(0)
+                    if 90 < lucky <= 100:
+                        w13_x = finish
 
-            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
-                off_screen_except(8)
-                background6.draw_bg(screen)
+                nv44 = nhanVat("nv44", w44_name[int(wi14)], w14_x, 550, 120, 120)
+                nv44.draw_nv()
+                if nv44.check_vc(box_but4):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 90:
+                        x4 = nv44.buff_speed(0)
+                    if 90 < lucky <= 100:
+                        w14_x = finish
+
+                nv45 = nhanVat("nv45", w45_name[int(wi14)], w15_x, 650, 120, 120)
+                nv45.draw_nv()
+                if nv45.check_vc(box_but5):
+                    lucky = random.randrange(1, 100)
+                    if 1 <= lucky <= 90:
+                        x5 = nv45.buff_speed(0)
+                    if 90 < lucky <= 100:
+                        w15_x = finish
+
+                if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
+                    off_screen_except(8)
+                    background6.draw_bg(screen)
+                    exit_but.draw_but(screen)
+                    if check_press(exit_but.image_rect, pos):
+                        off_screen_except(0.5)
+
+            if setnv11:
+                map1(pos)
+                nv11 = nhanVat("nv11", w11_name[int(wi11)], w11_x, 200, 120, 120)
+                nv11.draw_nv()
+                if nv11.check_vc(box_but1):
+                    lucky = random.randrange(1, 100)
+                    global box_active1
+                    if 0 <= lucky <= 90:
+                        x1 = nv11.buff_speed(0)
+                        wind_but = Button(wind, w11_x - 60, 200, 100, 80)
+                        wind_but.draw_but(screen)
+                    if 90 < lucky <= 100 and box_active1 == 0:
+                        boom_but1.draw_but(screen)
+                        w11_x = finish
+                    box_active1 += 1
+
+                nv12 = nhanVat("nv12", w12_name[int(wi11)], w12_x, 325, 120, 120)
+                nv12.draw_nv()
+                if nv12.check_vc(box_but2):
+                    lucky = random.randrange(1, 100)
+                    global box_active2
+
+                    if 1 <= lucky <= 90:
+                        x2 = nv12.buff_speed(1)
+                        wind_but = Button(wind, w12_x - 60, 325, 100, 80)
+                        wind_but.draw_but(screen)
+                    if 90 < lucky <= 100 and box_active2 == 0:
+                        w12_x = finish
+                        boom_but2.draw_but(screen)
+                    box_active2 += 1
+
+                nv13 = nhanVat("nv13", w13_name[int(wi11)], w13_x, 450, 120, 120)
+                nv13.draw_nv()
+                if nv13.check_vc(box_but3):
+                    lucky = random.randrange(1, 100)
+                    global box_active3
+                    if 1 <= lucky <= 90:
+                        x3 = nv13.buff_speed(2)
+                        wind_but = Button(wind, w13_x - 60, 450, 100, 80)
+                        wind_but.draw_but(screen)
+                    if 90 < lucky <= 100 and box_active3 == 0:
+                        w13_x = finish
+                        boom_but3.draw_but(screen)
+                    box_active3 += 1
+
+                nv14 = nhanVat("nv14", w14_name[int(wi11)], w14_x, 550, 120, 120)
+                nv14.draw_nv()
+                if nv14.check_vc(box_but4):
+                    lucky = random.randrange(1, 100)
+                    global box_active4
+
+                    if 1 <= lucky <= 90:
+                        x4 = nv14.buff_speed(3)
+                        wind_but = Button(wind, w14_x - 60, 550, 100, 80)
+                        wind_but.draw_but(screen)
+                    if 90 < lucky <= 100 and box_active4 == 0:
+                        w14_x = finish
+                        boom_but4.draw_but(screen)
+                    box_active4 += 1
+                nv15 = nhanVat("nv15", w15_name[int(wi11)], w15_x, 650, 120, 120)
+                nv15.draw_nv()
+                if nv15.check_vc(box_but5):
+                    lucky = random.randrange(1, 100)
+                    global box_active5
+                    box_active = 0
+                    if 1 <= lucky <= 90:
+                        x5 = nv15.buff_speed(4)
+                        wind_but = Button(wind, w15_x - 60, 650, 100, 80)
+                        wind_but.draw_but(screen)
+                    if 90 < lucky <= 100 and box_active5 == 0:
+                        w15_x = finish
+                        boom_but4.draw_but(screen)
+                    box_active5 += 1
+
+            list_x = [w11_x, w12_x, w13_x, w14_x, w15_x]
+
+            for i in range(5):
+                if list_x[i] > finish and list_nv_win[i] == 0:
+                    list_ranking.append("set01/PNG" + str(i + 1) + ".png")
+                    list_stt.append(i + 1)
+                    list_nv_win[i] = 1
+
+            if len(list_stt):
+                if (nv == list_stt[0] or nv2==list_stt[0]) and get_coin==False:
+                    coin=(coin-int(bet))+int(bet)*4
+                    get_coin=True
+                if ((nv != list_stt[0]) and (nv2==list_stt[0])) and get_coin==False:
+                    coin=(coin-bet)
+
+            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish:
                 exit_but.draw_but(screen)
                 if check_press(exit_but.image_rect, pos):
                     off_screen_except(0.5)
-        if setnv11:
-            map1(pos)
-            nv11 = nhanVat("nv11", w11_name[int(wi11)], w11_x, 200, 120, 120)
-            nv11.draw_nv()
-            if nv11.check_vc(box_but1):
-                lucky = random.randrange(1, 100)
-                box_active = 0
-                if box_active < 10:
-                    boom_but1.draw_but(screen)
-                if 1 <= lucky <= 90 and box_active == 0:
-                    x1 = nv11.buff_speed(0)
-                if 90 < lucky <= 100 and box_active == 0:
-                    w11_x = finish
-                box_active += 1
+                off_screen_except(8)
+                background6.draw_bg(screen)
+                screen.blit(pygame.transform.scale(pygame.image.load(list_ranking[0]), (200, 200)),
+                            (1344 // 2 - 100, 200))
+                screen.blit(pygame.transform.scale(pygame.image.load(list_ranking[1]), (200, 200)),
+                            (1344 // 2 - 300, 220))
+                screen.blit(pygame.transform.scale(pygame.image.load(list_ranking[2]), (200, 200)),
+                            (1344 // 2 + 100, 240))
+                exit_but.draw_but(screen)
+                list_nv_win = [0, 0, 0, 0, 0]
+                list_ranking = []
+                list_stt = []
+                screenshot=pygame.image.save(screen,"file.png")
 
-            nv12 = nhanVat("nv12", w12_name[int(wi11)], w12_x, 325, 120, 120)
-            nv12.draw_nv()
-            if nv12.check_vc(box_but2):
-                lucky = random.randrange(1, 100)
-                box_active = 0
-                boom_but2.draw_but(screen)
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 90:
-                    x2 = nv12.buff_speed(1)
-                if 90 < lucky <= 100 and box_active == 0:
-                    w12_x = finish
-                box_active += 1
-
-            nv13 = nhanVat("nv13", w13_name[int(wi11)], w13_x, 450, 120, 120)
-            nv13.draw_nv()
-            if nv13.check_vc(box_but3):
-                lucky = random.randrange(1, 100)
-                box_active = 0
-                boom_but3.draw_but(screen)
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 90:
-                    x3 = nv13.buff_speed(2)
-                if 90 < lucky <= 100 and box_active == 0:
-                    w13_x = finish
-                box_active += 1
-            nv14 = nhanVat("nv14", w14_name[int(wi11)], w14_x, 550, 120, 120)
-            nv14.draw_nv()
-            if nv14.check_vc(box_but4):
-                lucky = random.randrange(1, 100)
-                box_active = 0
-                boom_but4.draw_but(screen)
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 90:
-                    x4 = nv14.buff_speed(3)
-                if 90 < lucky <= 100 and box_active == 0:
-                    w14_x = finish
-                box_active += 1
-            nv15 = nhanVat("nv15", w15_name[int(wi11)], w15_x, 650, 120, 120)
-            nv15.draw_nv()
-            if nv15.check_vc(box_but5):
-                lucky = random.randrange(1, 100)
-                box_active = 0
-                boom_but5.draw_but(screen)
-                lucky = random.randrange(1, 100)
-                if 1 <= lucky <= 90:
-                    x5 = nv15.buff_speed(4)
-                if 90 < lucky <= 100 and box_active == 0:
-                    w15_x = finish
-                box_active += 1
-
-        list_x = [w11_x, w12_x, w13_x, w14_x, w15_x]
-        list_nv_win = [0, 0, 0, 0, 0]
-        list_ranking = [0,0,0,0,0]
-        for i in range(4):
-            if list_x[i] > finish-50 and list_nv_win[i]==0:
-                list_ranking[i]="set01/PNG" + str(i + 1) + ".png"
-                list_nv_win[i]=1
-
-        if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish:
-            off_screen_except(8)
-            background6.draw_bg(screen)
-            screen.blit(pygame.transform.scale(pygame.image.load(list_ranking[0]),(200,200)), (1344 // 2-100, 200))
-            screen.blit(pygame.transform.scale(pygame.image.load(list_ranking[1]), (200, 200)), (1344 // 2 - 300, 250))
-            screen.blit(pygame.transform.scale(pygame.image.load(list_ranking[2]), (200, 200)), (1344 // 2 + 200, 250))
-            exit_but.draw_but(screen)
-            if check_press(exit_but.image_rect, pos):
-                off_screen_except(0.5)
+                '''game_finish = 1
+                off_screen_except(0)'''
 
     if set3:
         map3(pos)
@@ -2205,21 +2392,18 @@ while True:
     if minigame_bool:
         minigame_screen()
     if rule_bool:
-        rule_screen()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+        Rule.rule_screen(lan, rule_page + 1)
 
-                if event.button == 4:
-                    y += 50
-                elif event.button == 5:
-                    if y >= 10:
-                        y -= 50
-        crop_rect = pygame.Rect(220, y, 550, 400)
-        screen.blit(rule_info, (350, 260), crop_rect)
+        exit_but.draw_but(screen)
+        if check_press(exit_but.image_rect, pos):
+            off_screen_except(0)
+        if pygame.mouse.get_pressed()[0] and rule_time:
+            rule_page += 1
+            rule_page %= 2
+            rule_time = 0
 
+        if pygame.mouse.get_pressed()[0] == 0 and rule_time == False:
+            rule_time = 1
     if choosenv_bool1:
         choose_nv_screen1()
     if choosenv_bool2:
@@ -2233,5 +2417,11 @@ while True:
         if check_press(pygame.Rect(50, 200, 200, 80), pos):
             time.sleep(0.2)
             off_screen_except(0.5)
+    if result:
+        exit_but.draw_but(screen)
+        if check_press(exit_but.image_rect,pos):
+            off_screen_except(0.5)
     pygame.display.update()
     clock.tick(60)
+    with open('coin.txt', 'w') as c:
+        c.write(str(coin))
