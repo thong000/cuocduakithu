@@ -59,6 +59,8 @@ class LoginApp(App):
                         self.lock = True
                         with open('log.txt', 'w') as file:
                             file.write(str(1))
+                        with open('user.txt', 'w') as file:
+                            file.write(name)
 
             else:
                 message = "User name doesn't exit"

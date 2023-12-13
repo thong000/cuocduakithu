@@ -10,9 +10,10 @@ import store_func
 import Rule
 import podium
 import os
+import menu_music
 
 pygame.init()
-
+pygame.mixer.init()
 # Mở file lan để xác định ngôn ngữ
 with open('lan.txt', 'r') as file:
     l = file.read()
@@ -63,6 +64,10 @@ random_x3 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 random_x4 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 random_x5 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 
+# music
+
+
+channel = pygame.mixer.Channel(0)
 # biến ngôn ngữ
 lan = True
 
@@ -96,11 +101,11 @@ pygame.display.set_caption("Cuộc đua kì thú")
 pygame.display.set_icon(pygame.image.load("SPEED RACE.png"))
 
 # vị trí của nhân vật và các chỉ số chạy mảng
-w11_x = -400
-w12_x = -400
-w13_x = -400
-w14_x = -400
-w15_x = -400
+w11_x = 1
+w12_x = 1
+w13_x = 1
+w14_x = 1
+w15_x = 1
 wi11 = 0
 wi12 = 0
 wi13 = 0
@@ -174,10 +179,22 @@ class nhanVat:
         self.img_array = img_array
         self.x = x
         self.y = y
+        self.w = w
+        self.h = h
         self.name = Button(img_array, x, y, w, h)
+        self.quicken = 0
 
-    def draw_nv(self):
-        self.name.draw_but(screen)
+    def draw_nv(self, i):
+        if rever[i] == 0:
+            self.name.draw_but(screen)
+        else:
+            if rever[i] > 80:
+                self.name.draw_but(screen)
+                screen.blit(reverse, (self.x - 25, self.y - 25))
+            else:
+                screen.blit(pygame.transform.flip(self.name.image, True, False), self.name.image_rect)
+            rever[i] -= 1
+        if quicken_atr[i]: screen.blit(quicken, (self.x - self.w // 2, self.y))
 
     '''check va cham voi "sur" (box,vạch đích,...)'''
 
@@ -206,6 +223,10 @@ class nhanVat:
             return 1.2
 
 
+win = pygame.image.load("end/win.png")
+lose = pygame.image.load("end/lose.png")
+thang = pygame.image.load("end/thang.png")
+thua = pygame.image.load("end/thua.png")
 '''Load set 1(cho map1)'''
 w11_name = ["w110", "w111", "w112", "w113", "w114", "w115", "w116", "w117", "w118", "w119", "w1110", "w1111", "w1112",
             "w1113", "w1114", "w1115", "w1116", "w1117", ]
@@ -784,9 +805,6 @@ choose_set1vn_but = Button(choose_set1vn, SCREEN_WIDTH // 2, 50, 250, 130)
 choose_set2_but = Button(choose_set2, SCREEN_WIDTH // 5, 50, 250, 130)
 choose_set2vn_but = Button(choose_set1vn, SCREEN_WIDTH // 5, 50, 250, 130)
 
-boom = pygame.image.load("hieuung/boom.png")
-wind = pygame.image.load("hieuung/gio.png")
-
 minigame = pygame.image.load("Button/minigame.png")
 minigame_but = Button(minigame, 300, 712, 160, 60)
 
@@ -943,6 +961,10 @@ S_nv5 = Text(game_font2, str(int(w15_x / 3)), 0, 0, 0)
 def check_press(rect, pos):
     if rect.collidepoint(pos):
         if pygame.mouse.get_pressed()[0] == 1:
+            pygame.mixer.init()
+            click_music = pygame.mixer.Sound("music/click.mp3")
+            click_music.play()
+            time.sleep(0.1)
             return True
         else:
             return False
@@ -1055,6 +1077,7 @@ def menu_screen():
     if set_ and lock == False:
         account_login()
     if lock:
+
         if lan:
             background.draw_bg(screen)
         else:
@@ -1067,17 +1090,16 @@ def menu_screen():
 
         if check_press(play_but.image_rect, pos):
             off_screen_except(0.5)
+
         if check_press(setting_but.image_rect, pos):
             off_screen_except(6)
+
         if check_press(minigame_but.image_rect, pos):
             off_screen_except(10)
+
             minigame_screen()
         if check_press(rule_but.image_rect, pos):
             off_screen_except(11)
-
-
-
-
     else:
         background.draw_bg(screen)
         if lan:
@@ -1089,22 +1111,16 @@ def menu_screen():
         setting_but.draw_but(screen)
 
     global w11_x, w12_x, w13_x, w14_x, w15_x, wi11, wi12, wi13, wi14, wi15
-    w11_x = -350
-    w12_x = -350
-    w13_x = -350
-    w14_x = -350
-    w15_x = -350
+    w11_x = 1
+    w12_x = 1
+    w13_x = 1
+    w14_x = 1
+    w15_x = 1
     wi11 = 0
     wi12 = 0
     wi13 = 0
     wi14 = 0
     wi15 = 0
-
-    random_x1 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-    random_x2 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-    random_x3 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-    random_x4 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
-    random_x5 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 
     store = store_func
     store.Store(lan, 1344 // 2, 768 // 2)
@@ -1179,16 +1195,29 @@ def wait_screen():
 
     # Reset bien khi ve menu chon nhan vat
     global w11_x, w12_x, w13_x, w14_x, w15_x, wi11, wi12, wi13, wi14, wi15
-    w11_x = -350
-    w12_x = -350
-    w13_x = -350
-    w14_x = -350
-    w15_x = -350
+    w11_x = 1
+    w12_x = 1
+    w13_x = 1
+    w14_x = 1
+    w15_x = 1
     wi11 = 0
     wi12 = 0
     wi13 = 0
     wi14 = 0
     wi15 = 0
+
+    global random_x1, random_x2, random_x3, random_x4, random_x5, box_but1, box_but2, box_but3, box_but4, box_but5
+    random_x1 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+    random_x2 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+    random_x3 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+    random_x4 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+    random_x5 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
+
+    box_but1 = Button(box, random_x1, 235, 50, 50)
+    box_but2 = Button(box, random_x2, 350, 50, 50)
+    box_but3 = Button(box, random_x3, 460, 50, 50)
+    box_but4 = Button(box, random_x4, 575, 50, 50)
+    box_but5 = Button(box, random_x5, 675, 50, 50)
 
     global x1, x2, x3, x4, x5
     x1 = random.uniform(0.8, 1.2)
@@ -1203,6 +1232,8 @@ def wait_screen():
     lucky3 = random.randrange(1, 100)
     lucky4 = random.randrange(1, 100)
     lucky5 = random.randrange(1, 100)
+
+    reset()
 
 
 def setting_screen():
@@ -1233,10 +1264,14 @@ nv = 0
 start_img = pygame.image.load("start/start.png")
 start_but = Button(start_img, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
 
+more_info = pygame.image.load("Button/more_info.png")
+more_info_but = Button(more_info, 1290, 325, 30, 30)
 
 
 def choose_nv_screen1():
+    global start_t
     global nv, setnv11, setnv21
+
     background0.draw_bg(screen)
     choosenv.draw_text(screen, 300, 10)
     set1_text.draw_text(screen, 50, 200)
@@ -1257,58 +1292,16 @@ def choose_nv_screen1():
         time.sleep(0.2)
 
     global s1_active, s2_active, s3_active, bet
-
-    if setnv11:
-        global nv
-        if check_press(Nv11_but.image_rect, pos):
-            nv = 1
-        if check_press(Nv12_but.image_rect, pos):
-            nv = 2
-        if check_press(Nv13_but.image_rect, pos):
-            nv = 3
-        if check_press(Nv14_but.image_rect, pos):
-            nv = 4
-        if check_press(Nv15_but.image_rect, pos):
-            nv = 5
-        nv1_choosed = Text(game_font1, "Character: " + str(nv), 0, 0, 0)
-        nv1_choosed.draw_text(screen, 500, 500)
-
-        Nv11_but.draw_but(screen)
-        Nv12_but.draw_but(screen)
-        Nv13_but.draw_but(screen)
-        Nv14_but.draw_but(screen)
-        Nv15_but.draw_but(screen)
-
-    if setnv21:
-
-        if check_press(Nv11_but.image_rect, pos):
-            nv = 1
-        if check_press(Nv12_but.image_rect, pos):
-            nv = 2
-        if check_press(Nv13_but.image_rect, pos):
-            nv = 3
-        if check_press(Nv14_but.image_rect, pos):
-            nv = 4
-        if check_press(Nv15_but.image_rect, pos):
-            nv = 5
-        nv1_choosed = Text(game_font1, "Character: " + str(nv), 0, 0, 0)
-        nv1_choosed.draw_text(screen, 500, 500)
-
-        Nv41_but.draw_but(screen)
-        Nv42_but.draw_but(screen)
-        Nv43_but.draw_but(screen)
-        Nv44_but.draw_but(screen)
-        Nv45_but.draw_but(screen)
-
+    global info
     if not s1_active:
         global finish
-        finish = 1080
+        finish = 1250
         Size1.draw_text(screen, 200, 600)
     else:
-        finish = 1030
+        finish = 1180
         size1_active.draw_text(screen, 200, 600)
     if not s2_active:
-        finish = 980
+        finish = 1100
         Size2.draw_text(screen, 100, 600)
         global background1
         background1 = background1_lv2
@@ -1340,6 +1333,101 @@ def choose_nv_screen1():
 
     text_surface = game_font1.render(bet, True, (255, 255, 255))
     screen.blit(text_surface, (600, 600))
+
+    if setnv11:
+        global x1, x2, x3, x4, x5
+        global nv
+        if check_press(Nv11_but.image_rect, pos):
+            nv = 1
+            if buff != 0:
+                x1 = random.uniform(0.8, 1.2) * buff
+            else:
+                x1 = random.uniform(0.8, 1.2)
+        if check_press(Nv12_but.image_rect, pos):
+            nv = 2
+            if buff != 0:
+                x2 = random.uniform(0.8, 1.2) * buff
+            else:
+                x2 = random.uniform(0.8, 1.2)
+        if check_press(Nv13_but.image_rect, pos):
+            nv = 3
+            if buff != 0:
+                x3 = random.uniform(0.8, 1.2) * buff
+            else:
+                x3 = random.uniform(0.8, 1.2)
+        if check_press(Nv14_but.image_rect, pos):
+            nv = 4
+            if buff != 0:
+                x4 = random.uniform(0.8, 1.2) * buff
+            else:
+                x4 = random.uniform(0.8, 1.2)
+        if check_press(Nv15_but.image_rect, pos):
+            nv = 5
+            if buff != 0:
+                x5 = random.uniform(0.8, 1.2) * buff
+            else:
+                x5 = random.uniform(0.8, 1.2)
+
+        nv1_choosed = Text(game_font1, "Character: " + str(nv), 0, 0, 0)
+        nv1_choosed.draw_text(screen, 500, 500)
+
+        Nv11_but.draw_but(screen)
+        Nv12_but.draw_but(screen)
+        Nv13_but.draw_but(screen)
+        Nv14_but.draw_but(screen)
+        Nv15_but.draw_but(screen)
+
+        more_info_but.draw_but(screen)
+        if check_press(more_info_but.image_rect, pos):
+            background0.draw_bg(screen)
+            nv_info(1, lan)
+
+    if setnv21:
+        if check_press(Nv11_but.image_rect, pos):
+            nv = 1
+            if buff != 0:
+                x1 = random.uniform(0.8, 1.2) * buff
+            else:
+                x1 = random.uniform(0.8, 1.2)
+        if check_press(Nv12_but.image_rect, pos):
+            nv = 2
+            if buff != 0:
+                x2 = random.uniform(0.8, 1.2) * buff
+            else:
+                x2 = random.uniform(0.8, 1.2)
+        if check_press(Nv13_but.image_rect, pos):
+            nv = 3
+            if buff != 0:
+                x3 = random.uniform(0.8, 1.2) * buff
+            else:
+                x3 = random.uniform(0.8, 1.2)
+        if check_press(Nv14_but.image_rect, pos):
+            nv = 4
+            if buff != 0:
+                x4 = random.uniform(0.8, 1.2) * buff
+            else:
+                x4 = random.uniform(0.8, 1.2)
+        if check_press(Nv15_but.image_rect, pos):
+            nv = 5
+            if buff != 0:
+                x5 = random.uniform(0.8, 1.2) * buff
+            else:
+                x5 = random.uniform(0.8, 1.2)
+
+        nv1_choosed = Text(game_font1, "Character: " + str(nv), 0, 0, 0)
+        nv1_choosed.draw_text(screen, 500, 500)
+
+        Nv41_but.draw_but(screen)
+        Nv42_but.draw_but(screen)
+        Nv43_but.draw_but(screen)
+        Nv44_but.draw_but(screen)
+        Nv45_but.draw_but(screen)
+
+        more_info_but.draw_but(screen)
+        if check_press(more_info_but.image_rect, pos):
+            background0.draw_bg(screen)
+            nv_info(4, lan)
+
     pygame.display.flip()
     exit_but.draw_but(screen)
     if check_press(exit_but.image_rect, pos):
@@ -1367,6 +1455,8 @@ def choose_nv_screen1():
         next_but.draw_but(screen)
         if check_press(next_but.image_rect, pos):
             if setnv11:
+                global i
+                i = 1
                 global box_active1, box_active2, box_active3, box_active4, box_active5
                 box_active1 = box_active2 = box_active3 = box_active4 = box_active5 = 0
                 global time_limit, start_time
@@ -1379,6 +1469,7 @@ def choose_nv_screen1():
                 off_screen_except(1)
                 setnv11 = True
             if setnv21:
+                i = 1
                 global box_active41, box_active42, box_active43, box_active44, box_active45
                 box_active41 = box_active42 = box_active43 = box_active44 = box_active45 = 0
                 three_limit = 1000
@@ -1396,6 +1487,7 @@ nv2 = 0
 
 def choose_nv_screen2():
     global setnv12, setnv22, nv2
+    global s1_active, s2_active, s3_active, bet
     background0.draw_bg(screen)
     choosenv.draw_text(screen, 300, 10)
     set1_text.draw_text(screen, 50, 200)
@@ -1410,48 +1502,6 @@ def choose_nv_screen2():
     if check_press(exit_but.image_rect, pos):
         off_screen_except(0.5)
         time.sleep(0.2)
-
-    global s1_active, s2_active, s3_active, bet
-    if setnv12:
-        global nv2
-        if check_press(Nv21_but.image_rect, pos):
-            nv2 = 1
-        if check_press(Nv22_but.image_rect, pos):
-            nv2 = 2
-        if check_press(Nv23_but.image_rect, pos):
-            nv2 = 3
-        if check_press(Nv24_but.image_rect, pos):
-            nv2 = 4
-        if check_press(Nv25_but.image_rect, pos):
-            nv2 = 5
-        nv_choosed = Text(game_font1, "Character: " + str(nv2), 0, 0, 0)
-        nv_choosed.draw_text(screen, 500, 500)
-
-        Nv21_but.draw_but(screen)
-        Nv22_but.draw_but(screen)
-        Nv23_but.draw_but(screen)
-        Nv24_but.draw_but(screen)
-        Nv25_but.draw_but(screen)
-
-    if setnv22:
-        if check_press(Nv51_but.image_rect, pos):
-            nv2 = 1
-        if check_press(Nv52_but.image_rect, pos):
-            nv2 = 2
-        if check_press(Nv53_but.image_rect, pos):
-            nv2 = 3
-        if check_press(Nv54_but.image_rect, pos):
-            nv2 = 4
-        if check_press(Nv55_but.image_rect, pos):
-            nv2 = 5
-        nv_choosed = Text(game_font1, "Character: " + str(nv2), 0, 0, 0)
-        nv_choosed.draw_text(screen, 500, 500)
-
-        Nv51_but.draw_but(screen)
-        Nv52_but.draw_but(screen)
-        Nv53_but.draw_but(screen)
-        Nv54_but.draw_but(screen)
-        Nv55_but.draw_but(screen)
 
     if not s1_active:
         Size1.draw_text(screen, 200, 600)
@@ -1486,7 +1536,99 @@ def choose_nv_screen2():
     exit_but.draw_but(screen)
     text_surface = game_font1.render(bet, True, (255, 255, 255))
     screen.blit(text_surface, (600, 600))
-    pygame.display.flip()
+
+    if setnv12:
+        global x1, x2, x3, x4, x5
+        global nv2
+        if check_press(Nv11_but.image_rect, pos):
+            nv2 = 1
+            if buff != 0:
+                x1 = random.uniform(0.8, 1.2) * buff
+            else:
+                x1 = random.uniform(0.8, 1.2)
+        if check_press(Nv12_but.image_rect, pos):
+            nv2 = 2
+            if buff != 0:
+                x2 = random.uniform(0.8, 1.2) * buff
+            else:
+                x2 = random.uniform(0.8, 1.2)
+        if check_press(Nv13_but.image_rect, pos):
+            nv2 = 3
+            if buff != 0:
+                x3 = random.uniform(0.8, 1.2) * buff
+            else:
+                x3 = random.uniform(0.8, 1.2)
+        if check_press(Nv14_but.image_rect, pos):
+            nv2 = 4
+            if buff != 0:
+                x4 = random.uniform(0.8, 1.2) * buff
+            else:
+                x4 = random.uniform(0.8, 1.2)
+        if check_press(Nv15_but.image_rect, pos):
+            nv2 = 5
+            if buff != 0:
+                x5 = random.uniform(0.8, 1.2) * buff
+            else:
+                x5 = random.uniform(0.8, 1.2)
+
+        nv_choosed = Text(game_font1, "Character: " + str(nv2), 0, 0, 0)
+        nv_choosed.draw_text(screen, 500, 500)
+
+        Nv21_but.draw_but(screen)
+        Nv22_but.draw_but(screen)
+        Nv23_but.draw_but(screen)
+        Nv24_but.draw_but(screen)
+        Nv25_but.draw_but(screen)
+
+        more_info_but.draw_but(screen)
+        if check_press(more_info_but.image_rect, pos):
+            background0.draw_bg(screen)
+            nv_info(2, lan)
+
+    if setnv22:
+        if check_press(Nv11_but.image_rect, pos):
+            nv2 = 1
+            if buff != 0:
+                x1 = random.uniform(0.8, 1.2) * buff
+            else:
+                x1 = random.uniform(0.8, 1.2)
+        if check_press(Nv12_but.image_rect, pos):
+            nv2 = 2
+            if buff != 0:
+                x2 = random.uniform(0.8, 1.2) * buff
+            else:
+                x2 = random.uniform(0.8, 1.2)
+        if check_press(Nv13_but.image_rect, pos):
+            nv2 = 3
+            if buff != 0:
+                x3 = random.uniform(0.8, 1.2) * buff
+            else:
+                x3 = random.uniform(0.8, 1.2)
+        if check_press(Nv14_but.image_rect, pos):
+            nv2 = 4
+            if buff != 0:
+                x4 = random.uniform(0.8, 1.2) * buff
+            else:
+                x4 = random.uniform(0.8, 1.2)
+        if check_press(Nv15_but.image_rect, pos):
+            nv2 = 5
+            if buff != 0:
+                x5 = random.uniform(0.8, 1.2) * buff
+            else:
+                x5 = random.uniform(0.8, 1.2)
+        nv_choosed = Text(game_font1, "Character: " + str(nv2), 0, 0, 0)
+        nv_choosed.draw_text(screen, 500, 500)
+
+        Nv51_but.draw_but(screen)
+        Nv52_but.draw_but(screen)
+        Nv53_but.draw_but(screen)
+        Nv54_but.draw_but(screen)
+        Nv55_but.draw_but(screen)
+
+        more_info_but.draw_but(screen)
+        if check_press(more_info_but.image_rect, pos):
+            background0.draw_bg(screen)
+            nv_info(5, lan)
 
     if check_press(exit_but.image_rect, pos):
         off_screen_except(0.5)
@@ -1615,6 +1757,13 @@ def choose_nv_screen3():
         next_but.draw_but(screen)
         next_but.draw_but(screen)
         if check_press(next_but.image_rect, pos):
+            global time_limit, start_time
+            global three_limit, two_limit, one_limit
+            three_limit = 1000
+            two_limit = 2000
+            one_limit = 3000
+            time_limit = 4000
+            start_time = pygame.time.get_ticks()
             off_screen_except(3)
 
     pygame.draw.rect(screen, (0, 0, 0), (600, 600, 300, 50), 2)
@@ -1725,15 +1874,15 @@ def map1(pos):
     box_but4 = Button(box, random_x4, 575, 50, 50)
     box_but5 = Button(box, random_x5, 675, 50, 50)
 
-    if random_x1 > w11_x:
+    if box_touch[1] == 0:
         box_but1.draw_but(screen)
-    if random_x2 > w12_x:
+    if box_touch[2] == 0:
         box_but2.draw_but(screen)
-    if random_x3 > w13_x:
+    if box_touch[3] == 0:
         box_but3.draw_but(screen)
-    if random_x4 > w14_x:
+    if box_touch[4] == 0:
         box_but4.draw_but(screen)
-    if random_x5 > w15_x:
+    if box_touch[5] == 0:
         box_but5.draw_but(screen)
 
 
@@ -1781,15 +1930,15 @@ def map2(pos):
         head54_but.draw_but(screen)
         head55_but.draw_but(screen)
 
-    if random_x1 > w11_x:
+    if box_touch[1] == 0:
         box_but1.draw_but(screen)
-    if random_x2 > w12_x:
+    if box_touch[2] == 0:
         box_but2.draw_but(screen)
-    if random_x3 > w13_x:
+    if box_touch[3] == 0:
         box_but3.draw_but(screen)
-    if random_x4 > w14_x:
+    if box_touch[4] == 0:
         box_but4.draw_but(screen)
-    if random_x5 > w15_x:
+    if box_touch[5] == 0:
         box_but5.draw_but(screen)
 
 
@@ -1814,15 +1963,15 @@ def map3(pos):
     box_but4 = Button(box, random_x4, 575, 50, 50)
     box_but5 = Button(box, random_x5, 675, 50, 50)
 
-    if random_x1 > w11_x:
+    if box_touch[1] == 0:
         box_but1.draw_but(screen)
-    if random_x2 > w12_x:
+    if box_touch[2] == 0:
         box_but2.draw_but(screen)
-    if random_x3 > w13_x:
+    if box_touch[3] == 0:
         box_but3.draw_but(screen)
-    if random_x4 > w14_x:
+    if box_touch[4] == 0:
         box_but4.draw_but(screen)
-    if random_x5 > w15_x:
+    if box_touch[5] == 0:
         box_but5.draw_but(screen)
     head31_but = Button(head31, 80, 35, 26, 26)
     head32_but = Button(head32, 80, 60, 29, 29)
@@ -1884,17 +2033,119 @@ set2_info = pygame.image.load("nvinfo/info2.png")
 set4_info = pygame.image.load("nvinfo/info4.png")
 set5_info = pygame.image.load("nvinfo/info5.png")
 
-set1_info1vn = pygame.image.load("nvinfo/info1vn.png")
-set2_info2vn = pygame.image.load("nvinfo/info2vn.png")
-set4_info4vn = pygame.image.load("nvinfo/info4vn.png")
-set5_info5vn = pygame.image.load("nvinfo/info5vn.png")
-
 set1_info_bg = Background(set1_info)
+set2_info_bg = Background(set2_info)
+set4_info_bg = Background(set4_info)
+set5_info_bg = Background(set5_info)
 
-##############Màn hình info nhân vật
-'''def nv_info(set,lan):'''
+set1_infovn = pygame.image.load("nvinfo/info1vn.png")
+set2_infovn = pygame.image.load("nvinfo/info2vn.png")
+set4_infovn = pygame.image.load("nvinfo/info4vn.png")
+set5_infovn = pygame.image.load("nvinfo/info5vn.png")
 
+set1_infovn_bg = Background(set1_infovn)
+set2_infovn_bg = Background(set2_infovn)
+set4_infovn_bg = Background(set4_infovn)
+set5_infovn_bg = Background(set5_infovn)
+
+
+# Màn hình info nhân vật
+def nv_info(set, lan):
+    if lan:
+        if set == 1: set1_info_bg.draw_bg(screen)
+        if set == 2: set2_info_bg.draw_bg(screen)
+        if set == 4: set4_info_bg.draw_bg(screen)
+        if set == 5: set5_info_bg.draw_bg(screen)
+    else:
+        if set == 1: set1_infovn_bg.draw_bg(screen)
+        if set == 2: set2_infovn_bg.draw_bg(screen)
+        if set == 4: set4_infovn_bg.draw_bg(screen)
+        if set == 5: set5_infovn_bg.draw_bg(screen)
+
+
+teleport = pygame.image.load("hieuung/teleport.png")
+teleport = pygame.transform.scale(teleport, (100, 150))
+stun = pygame.image.load("hieuung/stun.png")
+stun = pygame.transform.scale(stun, (75, 50))
+quicken = pygame.image.load("hieuung/quicken.png")
+quicken = pygame.transform.scale(quicken, (50, 50))
+boom = pygame.image.load("hieuung/boom.png")
+boom = pygame.transform.scale(boom, (50, 50))
+reverse = pygame.image.load("hieuung/reverse.png")
+reverse = pygame.transform.scale(reverse, (50, 50))
+
+
+def reset():  # hàm làm mới các hiệu ứng trước khi bắt đầu 1 game mới
+    global quicken_atr, box_touch, rever, k_stun, tele, tele_x
+    quicken_atr = [0, 0, 0, 0, 0, 0]
+    box_touch = [0, 0, 0, 0, 0, 0]
+    rever = [0, 0, 0, 0, 0, 0]
+    k_stun = [0, 0, 0, 0, 0, 0]
+    tele = [0, 0, 0, 0, 0, 0]
+    tele_x = [0, 0, 0, 0, 0, 0]
+
+
+def stun_effect(obj_x, m, frame, y):  # hiệu ứng làm choáng
+    obj_x -= m
+    frame -= 1
+    t = False
+    if (frame // 5) % 2: t = True
+    if frame > 130:
+        screen.blit(boom, (obj_x - 25, y - 25))
+    else:
+        screen.blit(pygame.transform.flip(stun, t, False), (obj_x - 25, y - 80))
+    return obj_x, frame
+
+
+def tele_effect(frame, x, dist, y):  # hiệu ứng teleport
+    screen.blit(teleport, (x - 25, y - 75))
+    screen.blit(teleport, (x + dist - 25, y - 75))
+    return frame - 1
+
+
+def lucky_atr(obj_x, dist, lucky, nv, i):  # làm gọn phần xử lí chỉ số may mắn
+    box_touch[i] = 1
+    if 1 <= lucky <= 30:  # tỉ lệ lần lượt là tăng tốc 30%
+        dist = nv.buff_speed(0)  # choáng   25%
+        quicken_atr[i] = 1  # quay đầu 25%
+    if 31 <= lucky <= 55:  # tele     20%
+        k_stun[i] = 150  # về đích   1%
+    if 56 <= lucky <= 80:  # các mảng k_stun, rever, tele, quicken_atr là để đếm thời gian vẽ các hiệu ứng
+        rever[i] = 100
+    if 81 <= lucky <= 99:
+        tele[i] = 20
+        tele_x[i] = obj_x
+        obj_x += lucky * 3
+    if lucky == 100:
+        tele[i] = 20
+        tele_x[i] = obj_x
+        lucky = (finish + 10 - obj_x) // 3
+        obj_x = finish
+    return obj_x, dist
+
+
+def play_sound_effect(sound_file):
+    sound = pygame.mixer.Sound(sound_file)
+    sound.play()
+    return sound
+
+
+def play_background_music(music_file):
+    pygame.mixer.music.load(music_file)
+    pygame.mixer.music.play(-1)
+
+
+start_t = 0
+i = 0
+play_background_music("music/nhacnengame.mp3")
+reset()
+k_stun = 0
+music = 0
 while True:
+
+    with open('user.txt', 'r') as file:
+        user = file.read()
+    print(user)
 
     global pos
     pos = pygame.mouse.get_pos()
@@ -1906,19 +2157,19 @@ while True:
     S_nv4 = Text(game_font2, str(int(w14_x / 5)), 0, 0, 0)
     S_nv5 = Text(game_font2, str(int(w15_x / 5)), 0, 0, 0)
 
-    if w11_x < finish + 10:
+    if w11_x < finish + 30:
         w11_x += x1
 
-    if w12_x < finish + 10:
+    if w12_x < finish + 30:
         w12_x += x2
 
-    if w13_x < finish + 10:
+    if w13_x < finish + 30:
         w13_x += x3
 
-    if w14_x < finish + 10:
+    if w14_x < finish + 30:
         w14_x += x4
 
-    if w15_x < finish + 10:
+    if w15_x < finish + 30:
         w15_x += x5
 
     wi11 += 0.5
@@ -1952,11 +2203,16 @@ while True:
             sys.exit()
 
     if set_:
+
         menu_screen()
+        music = 0
         store_img = pygame.image.load("extra_stuff/store/store.png")
         store = Button(store_img, 1200, 650, 200, 200)
         store.draw_but(screen)
         if check_press(store.image_rect, pos):
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("music/nhac nen mua do.mp3")
+            pygame.mixer.music.play(-1)
             if game_finish == 1:
                 shop.buy1 = True
                 shop.buy2 = True
@@ -1973,34 +2229,35 @@ while True:
     if setting_bool:
         setting_screen()
     if set2:
+        music = 1
         current_time = pygame.time.get_ticks()
         elapsed_time = current_time - start_time
-        if elapsed_time < three_limit:
+        if elapsed_time < 1000:
+            background2.draw_bg(screen)
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("music/countdown1.mp3")
+            pygame.mixer.music.play(0)
+        elif elapsed_time < three_limit + 1000:
             background2.draw_bg(screen)
             three_but.draw_but(screen)
-        elif elapsed_time < two_limit:
+        elif elapsed_time < two_limit + 1000:
             background2.draw_bg(screen)
             two_but.draw_but(screen)
-        elif elapsed_time < one_limit:
+        elif elapsed_time < one_limit + 1000:
             background2.draw_bg(screen)
             one_but.draw_but(screen)
-        elif elapsed_time < time_limit:
+        elif elapsed_time < time_limit + 1000:
             background2.draw_bg(screen)
             if lan:
                 start_but.draw_but(screen)
             else:
                 start_butvn.draw_but(screen)
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("music/lucvodua2.mp3")
+            pygame.mixer.music.play(0)
+            w11_x = w12_x = w13_x = w14_x = w15_x = 10
         else:
-            if nv == 1:
-                x1 += x1 * 100 * buff
-            if nv == 2:
-                x2 = x2 * 100 * buff
-            if nv == 3:
-                x3 = x3 * 100 * buff
-            if nv == 4:
-                x4 = x4 * 100 * buff
-            if nv == 5:
-                x5 = x5 * 100 * buff
+
             boom_but1 = Button(boom, box_but1.x, 225, 90, 90)
             boom_but2 = Button(boom, box_but2.x, 345, 90, 90)
             boom_but3 = Button(boom, box_but3.x, 470, 90, 90)
@@ -2008,158 +2265,87 @@ while True:
             boom_but5 = Button(boom, box_but5.x, 660, 90, 90)
             map2(pos)
             if check_press(exit_but.image_rect, pos):
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load("music/nhacnengame.mp3")
+                pygame.mixer.music.play(-1)
                 off_screen_except(0.5)
                 time.sleep(0.2)
             if setnv12:
                 choosen_set = 2
                 nv21 = nhanVat("nv21", w21_name[int(wi12)], w11_x, 200, 120, 120)
-                nv21.draw_nv()
-                if nv21.check_vc(box_but1):
-                    lucky = random.randrange(1, 100)
-                    global box_active21
-                    if 0 <= lucky <= 90:
-                        x1 = nv21.buff_speed(0)
-                        wind_but = Button(wind, w11_x - 60, 200, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active21 == 0:
-                        boom_but1.draw_but(screen)
-                        w11_x = finish
-                    box_active21 += 1
+                nv21.draw_nv(1)
+                if nv21.check_vc(box_but1) and box_touch[1] == 0: w11_x, x1 = lucky_atr(w11_x, x1, lucky1, nv21, 1)
+                if k_stun[1]: w11_x, k_stun[1] = stun_effect(w11_x, x1, k_stun[1], 200)
+                if rever[1]: w11_x -= 2 * x1
+                if tele[1]: tele[1] = tele_effect(tele[1], tele_x[1], lucky1 * 3, 200)
 
                 nv22 = nhanVat("nv22", w22_name[int(wi12)], w12_x, 325, 120, 120)
-                nv22.draw_nv()
-                if nv22.check_vc(box_but2):
-                    lucky = random.randrange(1, 100)
-                    global box_active22
-                    if 0 <= lucky <= 90:
-                        x1 = nv22.buff_speed(0)
-                        wind_but = Button(wind, w11_x - 60, 200, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active22 == 0:
-                        boom_but1.draw_but(screen)
-                        w11_x = finish
-                    box_active22 += 1
+                nv22.draw_nv(2)
+                if nv22.check_vc(box_but2) and box_touch[2] == 0: w12_x, x2 = lucky_atr(w12_x, x2, lucky2, nv22, 2)
+                if k_stun[2]: w12_x, k_stun[2] = stun_effect(w12_x, x2, k_stun[2], 325)
+                if rever[2]: w12_x -= 2 * x2
+                if tele[2]: tele[2] = tele_effect(tele[2], tele_x[2], lucky2 * 3, 325)
 
                 nv23 = nhanVat("nv23", w23_name[int(wi12)], w13_x, 450, 120, 120)
-                nv23.draw_nv()
-                if nv23.check_vc(box_but3):
-                    lucky = random.randrange(1, 100)
-                    global box_active23
-                    if 1 <= lucky <= 90:
-                        x3 = nv23.buff_speed(2)
-                        wind_but = Button(wind, w13_x - 60, 450, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active23 == 0:
-                        w13_x = finish
-                        boom_but3.draw_but(screen)
-                    box_active23 += 1
+                nv23.draw_nv(3)
+                if nv23.check_vc(box_but3) and box_touch[3] == 0: w13_x, x3 = lucky_atr(w13_x, x3, lucky3, nv23, 3)
+                if k_stun[3]: w13_x, k_stun[3] = stun_effect(w13_x, x3, k_stun[3], 450)
+                if rever[3]: w13_x -= 2 * x3
+                if tele[3]: tele[3] = tele_effect(tele[3], tele_x[3], lucky3 * 3, 450)
 
                 nv24 = nhanVat("nv24", w24_name[int(wi12)], w14_x, 550, 120, 120)
-                nv24.draw_nv()
-                if nv24.check_vc(box_but4):
-                    lucky = random.randrange(1, 100)
-                    global box_active24
-
-                    if 1 <= lucky <= 90:
-                        x4 = nv24.buff_speed(3)
-                        wind_but = Button(wind, w14_x - 60, 550, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active24 == 0:
-                        w14_x = finish
-                        boom_but4.draw_but(screen)
-                    box_active24 += 1
+                nv24.draw_nv(4)
+                if nv24.check_vc(box_but4) and box_touch[4] == 0: w14_x, x4 = lucky_atr(w14_x, x4, lucky4, nv24, 4)
+                if k_stun[4]: w14_x, k_stun[4] = stun_effect(w14_x, x4, k_stun[4], 550)
+                if rever[4]: w14_x -= 2 * x4
+                if tele[4]: tele[4] = tele_effect(tele[4], tele_x[4], lucky4 * 3, 550)
 
                 nv25 = nhanVat("nv25", w25_name[int(wi12)], w15_x, 650, 120, 120)
-                nv25.draw_nv()
-                if nv25.check_vc(box_but5):
-                    lucky = random.randrange(1, 100)
-                    global box_active25
-                    box_active = 0
-                    if 1 <= lucky <= 90:
-                        x5 = nv25.buff_speed(4)
-                        wind_but = Button(wind, w15_x - 60, 650, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active25 == 0:
-                        w15_x = finish
-                        boom_but4.draw_but(screen)
-                    box_active25 += 1
+                nv25.draw_nv(5)
+                if nv25.check_vc(box_but5) and box_touch[5] == 0: w15_x, x5 = lucky_atr(w15_x, x5, lucky5, nv25, 5)
+                if k_stun[5]: w15_x, k_stun[5] = stun_effect(w15_x, x5, k_stun[5], 650)
+                if rever[5]: w15_x -= 2 * x5
+                if tele[5]: tele[5] = tele_effect(tele[5], tele_x[5], lucky5 * 3, 650)
 
             if setnv22:
                 choosen_set = 5
                 nv51 = nhanVat("nv51", w51_name[int(wi15)], w11_x, 200, 100, 100)
-                nv51.draw_nv()
-                if nv51.check_vc(box_but1):
-                    lucky = random.randrange(1, 100)
-                    global box_active51
-                    if 0 <= lucky <= 90:
-                        x1 = nv51.buff_speed(0)
-                        wind_but = Button(wind, w11_x - 60, 200, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active51 == 0:
-                        boom_but1.draw_but(screen)
-                        w11_x = finish
-                    box_active51 += 1
+                nv51.draw_nv(1)
+                if nv51.check_vc(box_but1) and box_touch[1] == 0: w11_x, x1 = lucky_atr(w11_x, x1, lucky1, nv51, 1)
+                if k_stun[1]: w11_x, k_stun[1] = stun_effect(w11_x, x1, k_stun[1], 200)
+                if rever[1]: w11_x -= 2 * x1
+                if tele[1]: tele[1] = tele_effect(tele[1], tele_x[1], lucky1 * 3, 200)
 
                 nv52 = nhanVat("nv52", w52_name[int(wi15)], w12_x, 325, 100, 100)
-                nv52.draw_nv()
-                if nv52.check_vc(box_but2):
-                    lucky = random.randrange(1, 100)
-                    global box_active52
+                nv52.draw_nv(2)
+                if nv52.check_vc(box_but2) and box_touch[2] == 0: w12_x, x2 = lucky_atr(w12_x, x2, lucky2, nv52, 2)
+                if k_stun[2]: w12_x, k_stun[2] = stun_effect(w12_x, x2, k_stun[2], 325)
+                if rever[2]: w12_x -= 2 * x2
+                if tele[2]: tele[2] = tele_effect(tele[2], tele_x[2], lucky2 * 3, 325)
 
-                    if 1 <= lucky <= 90:
-                        x2 = nv52.buff_speed(1)
-                        wind_but = Button(wind, w12_x - 60, 325, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active52 == 0:
-                        w12_x = finish
-                        boom_but2.draw_but(screen)
-                    box_active52 += 1
                 nv53 = nhanVat("nv53", w53_name[int(wi15)], w13_x, 450, 100, 100)
-                nv53.draw_nv()
-                if nv53.check_vc(box_but3):
-                    lucky = random.randrange(1, 100)
-                    global box_active53
-                    if 1 <= lucky <= 90:
-                        x3 = nv53.buff_speed(2)
-                        wind_but = Button(wind, w13_x - 60, 450, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active53 == 0:
-                        w13_x = finish
-                        boom_but3.draw_but(screen)
-                    box_active53 += 1
+                nv53.draw_nv(3)
+                if nv53.check_vc(box_but3) and box_touch[3] == 0: w13_x, x3 = lucky_atr(w13_x, x3, lucky3, nv53, 3)
+                if k_stun[3]: w13_x, k_stun[3] = stun_effect(w13_x, x3, k_stun[3], 450)
+                if rever[3]: w13_x -= 2 * x3
+                if tele[3]: tele[3] = tele_effect(tele[3], tele_x[3], lucky3 * 3, 450)
 
                 nv54 = nhanVat("nv54", w54_name[int(wi15)], w14_x, 550, 100, 100)
-                nv54.draw_nv()
-                if nv54.check_vc(box_but4):
-                    lucky = random.randrange(1, 100)
-                    global box_active54
-
-                    if 1 <= lucky <= 90:
-                        x4 = nv54.buff_speed(3)
-                        wind_but = Button(wind, w14_x - 60, 550, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active54 == 0:
-                        w14_x = finish
-                        boom_but4.draw_but(screen)
-                    box_active54 += 1
+                nv54.draw_nv(4)
+                if nv54.check_vc(box_but4) and box_touch[4] == 0: w14_x, x4 = lucky_atr(w14_x, x4, lucky4, nv54, 4)
+                if k_stun[4]: w14_x, k_stun[4] = stun_effect(w14_x, x4, k_stun[4], 550)
+                if rever[4]: w14_x -= 2 * x4
+                if tele[4]: tele[4] = tele_effect(tele[4], tele_x[4], lucky4 * 3, 550)
 
                 nv55 = nhanVat("nv55", w55_name[int(wi15)], w15_x, 650, 100, 100)
-                nv55.draw_nv()
-                if nv55.check_vc(box_but5):
-                    lucky = random.randrange(1, 100)
-                    global box_active55
-                    box_active = 0
-                    if 1 <= lucky <= 90:
-                        x5 = nv55.buff_speed(4)
-                        wind_but = Button(wind, w15_x - 60, 650, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active55 == 0:
-                        w15_x = finish
-                        boom_but5.draw_but(screen)
-                    box_active55 += 1
+                nv55.draw_nv(5)
+                if nv55.check_vc(box_but5) and box_touch[5] == 0: w15_x, x5 = lucky_atr(w15_x, x5, lucky5, nv55, 5)
+                if k_stun[5]: w15_x, k_stun[5] = stun_effect(w15_x, x5, k_stun[5], 650)
+                if rever[5]: w15_x -= 2 * x5
+                if tele[5]: tele[5] = tele_effect(tele[5], tele_x[5], lucky5 * 3, 650)
 
-                    if check_press(exit_but.image_rect, pos):
-                        off_screen_except(0.5)
+                if check_press(exit_but.image_rect, pos):
+                    off_screen_except(0.5)
 
             list_x = [w11_x, w12_x, w13_x, w14_x, w15_x]
 
@@ -2175,16 +2361,34 @@ while True:
                     get_coin = True
                 if ((nv != list_stt[0]) and (nv2 == list_stt[0])) and get_coin == False:
                     coin = (coin - int(bet))
+                    get_coin = True
 
-            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish:
+            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish+30:
                 exit_but.draw_but(screen)
+                if i == 0:
+                    start_t = pygame.time.get_ticks()
+                    i += 0.1
 
+                if nv == list_stt[0]:
+                    cur_time = pygame.time.get_ticks()
+                    if cur_time - start_t < 10000:
+                        win_but = Button(win, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+                        win_but.draw_but(screen)
+                        time.sleep(1)
+                else:
+                    print(start_t)
+                    cur_time = pygame.time.get_ticks()
+                    if cur_time - start_t < 10000:
+                        lose_but = Button(lose, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
+                        lose_but.draw_but(screen)
+                        time.sleep(1)
                 if check_press(exit_but.image_rect, pos):
                     off_screen_except(0.5)
 
                 s = podium.after_race(list_stt[0], list_stt[1], list_stt[2], list_stt[3], list_stt[4], choosen_set,
                                       screen,
                                       SCREEN_WIDTH, SCREEN_HEIGHT)
+
 
                 next_but = Button(next_img, 1200, 720, 100, 50)
                 next_but.draw_but(screen)
@@ -2195,35 +2399,34 @@ while True:
                 list_ranking = []
                 list_stt = []
     if set1:
-
         current_time = pygame.time.get_ticks()
         elapsed_time = current_time - start_time
-        if elapsed_time < three_limit:
+        if elapsed_time < 1000:
+            background1.draw_bg(screen)
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("music/countdown1.mp3")
+            pygame.mixer.music.play(0)
+        elif elapsed_time < three_limit + 1000:
             background1.draw_bg(screen)
             three_but.draw_but(screen)
-        elif elapsed_time < two_limit:
+        elif elapsed_time < two_limit + 1000:
             background1.draw_bg(screen)
             two_but.draw_but(screen)
-        elif elapsed_time < one_limit:
+        elif elapsed_time < one_limit + 1000:
             background1.draw_bg(screen)
             one_but.draw_but(screen)
-        elif elapsed_time < time_limit:
+        elif elapsed_time < time_limit + 1000:
             background1.draw_bg(screen)
             if lan:
                 start_but.draw_but(screen)
             else:
                 start_butvn.draw_but(screen)
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("music/lucvodua2.mp3")
+            pygame.mixer.music.play(0)
+            w11_x = w12_x = w13_x = w14_x = w15_x = 1
         else:
-            if nv == 1:
-                x1 += x1 * 100 * buff
-            if nv == 2:
-                x2 += x2 * 100 * buff
-            if nv == 3:
-                x3 += x3 * 100 * buff
-            if nv == 4:
-                x4 += x4 * 100 * buff
-            if nv == 5:
-                x5 += x5 * 100 * buff
+
             boom_but1 = Button(boom, box_but1.x, 225, 90, 90)
             boom_but2 = Button(boom, box_but2.x, 345, 90, 90)
             boom_but3 = Button(boom, box_but3.x, 470, 90, 90)
@@ -2237,153 +2440,79 @@ while True:
             if setnv21:
                 choosen_set = 4
                 nv41 = nhanVat("nv41", w41_name[int(wi14)], w11_x, 200, 120, 120)
-                nv41.draw_nv()
-                if nv41.check_vc(box_but1):
-                    lucky = random.randrange(1, 100)
-                    global box_active41
-                    if 0 <= lucky <= 90:
-                        x1 = nv41.buff_speed(0)
-                        wind_but = Button(wind, w11_x - 60, 200, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active41 == 0:
-                        boom_but1.draw_but(screen)
-                        w11_x = finish
-                    box_active41 += 1
+                nv41.draw_nv(1)
+                if nv41.check_vc(box_but1) and box_touch[1] == 0: w11_x, x1 = lucky_atr(w11_x, x1, lucky1, nv41, 1)
+                if k_stun[1]: w11_x, k_stun[1] = stun_effect(w11_x, x1, k_stun[1], 200)
+                if rever[1]: w11_x -= 2 * x1
+                if tele[1]: tele[1] = tele_effect(tele[1], tele_x[1], lucky1 * 3, 200)
 
                 nv42 = nhanVat("nv42", w42_name[int(wi14)], w12_x, 325, 120, 120)
-                nv42.draw_nv()
-                if nv42.check_vc(box_but2):
-                    lucky = random.randrange(1, 100)
-                    global box_active42
-
-                    if 1 <= lucky <= 90:
-                        x2 = nv42.buff_speed(1)
-                        wind_but = Button(wind, w12_x - 60, 325, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active42 == 0:
-                        w12_x = finish
-                        boom_but2.draw_but(screen)
-                    box_active42 += 1
+                nv42.draw_nv(2)
+                if nv42.check_vc(box_but2) and box_touch[2] == 0: w12_x, x2 = lucky_atr(w12_x, x2, lucky2, nv42, 2)
+                if k_stun[2]: w12_x, k_stun[2] = stun_effect(w12_x, x2, k_stun[2], 325)
+                if rever[2]: w12_x -= 2 * x2
+                if tele[2]: tele[2] = tele_effect(tele[2], tele_x[2], lucky2 * 3, 325)
 
                 nv43 = nhanVat("nv43", w43_name[int(wi14)], w13_x, 450, 120, 120)
-                nv43.draw_nv()
-                if nv43.check_vc(box_but3):
-                    lucky = random.randrange(1, 100)
-                    global box_active43
-                    if 1 <= lucky <= 90:
-                        x3 = nv43.buff_speed(2)
-                        wind_but = Button(wind, w13_x - 60, 450, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active43 == 0:
-                        w13_x = finish
-                        boom_but3.draw_but(screen)
-                    box_active43 += 1
+                nv43.draw_nv(3)
+                if nv43.check_vc(box_but3) and box_touch[3] == 0: w13_x, x3 = lucky_atr(w13_x, x3, lucky3, nv43, 3)
+                if k_stun[3]: w13_x, k_stun[3] = stun_effect(w13_x, x3, k_stun[3], 450)
+                if rever[3]: w13_x -= 2 * x3
+                if tele[3]: tele[3] = tele_effect(tele[3], tele_x[3], lucky3 * 3, 450)
 
                 nv44 = nhanVat("nv44", w44_name[int(wi14)], w14_x, 550, 120, 120)
-                nv44.draw_nv()
-                if nv44.check_vc(box_but4):
-                    lucky = random.randrange(1, 100)
-                    global box_active44
-
-                    if 1 <= lucky <= 90:
-                        x4 = nv44.buff_speed(3)
-                        wind_but = Button(wind, w14_x - 60, 550, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active44 == 0:
-                        w14_x = finish
-                        boom_but4.draw_but(screen)
-                    box_active44 += 1
+                nv44.draw_nv(4)
+                if nv44.check_vc(box_but4) and box_touch[4] == 0: w14_x, x4 = lucky_atr(w14_x, x4, lucky4, nv44, 4)
+                if k_stun[4]: w14_x, k_stun[4] = stun_effect(w14_x, x4, k_stun[4], 550)
+                if rever[4]: w14_x -= 2 * x4
+                if tele[4]: tele[4] = tele_effect(tele[4], tele_x[4], lucky4 * 3, 550)
 
                 nv45 = nhanVat("nv45", w45_name[int(wi14)], w15_x, 650, 120, 120)
-                nv45.draw_nv()
-                if nv45.check_vc(box_but5):
-                    lucky = random.randrange(1, 100)
-                    global box_active45
-                    box_active = 0
-                    if 1 <= lucky <= 90:
-                        x5 = nv45.buff_speed(4)
-                        wind_but = Button(wind, w15_x - 60, 650, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active45 == 0:
-                        w15_x = finish
-                        boom_but4.draw_but(screen)
-                    box_active45 += 1
+                nv45.draw_nv(5)
+                if nv45.check_vc(box_but5) and box_touch[5] == 0: w15_x, x5 = lucky_atr(w15_x, x5, lucky5, nv45, 5)
+                if k_stun[5]: w15_x, k_stun[5] = stun_effect(w15_x, x5, k_stun[5], 650)
+                if rever[5]: w15_x -= 2 * x5
+                if tele[5]: tele[5] = tele_effect(tele[5], tele_x[5], lucky5 * 3, 650)
+
                 list_x = [w11_x, w12_x, w13_x, w14_x, w15_x]
 
             if setnv11:
                 choosen_set = 1
                 map1(pos)
                 nv11 = nhanVat("nv11", w11_name[int(wi11)], w11_x, 200, 120, 120)
-                nv11.draw_nv()
-                if nv11.check_vc(box_but1):
-                    lucky = random.randrange(1, 100)
-                    global box_active1
-                    if 0 <= lucky <= 90:
-                        x1 = nv11.buff_speed(0)
-                        wind_but = Button(wind, w11_x - 60, 200, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active1 == 0:
-                        boom_but1.draw_but(screen)
-                        w11_x = finish
-                    box_active1 += 1
+                nv11.draw_nv(1)
+                if nv11.check_vc(box_but1) and box_touch[1] == 0: w11_x, x1 = lucky_atr(w11_x, x1, lucky1, nv11, 1)
+                if k_stun[1]: w11_x, k_stun[1] = stun_effect(w11_x, x1, k_stun[1], 200)
+                if rever[1]: w11_x -= 2 * x1
+                if tele[1]: tele[1] = tele_effect(tele[1], tele_x[1], lucky1 * 3, 200)
 
                 nv12 = nhanVat("nv12", w12_name[int(wi11)], w12_x, 325, 120, 120)
-                nv12.draw_nv()
-                if nv12.check_vc(box_but2):
-                    lucky = random.randrange(1, 100)
-                    global box_active2
-
-                    if 1 <= lucky <= 90:
-                        x2 = nv12.buff_speed(1)
-                        wind_but = Button(wind, w12_x - 60, 325, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active2 == 0:
-                        w12_x = finish
-                        boom_but2.draw_but(screen)
-                    box_active2 += 1
+                nv12.draw_nv(2)
+                if nv12.check_vc(box_but2) and box_touch[2] == 0: w12_x, x2 = lucky_atr(w12_x, x2, lucky2, nv12, 2)
+                if k_stun[2]: w12_x, k_stun[2] = stun_effect(w12_x, x2, k_stun[2], 325)
+                if rever[2]: w12_x -= 2 * x2
+                if tele[2]: tele[2] = tele_effect(tele[2], tele_x[2], lucky2 * 3, 325)
 
                 nv13 = nhanVat("nv13", w13_name[int(wi11)], w13_x, 450, 120, 120)
-                nv13.draw_nv()
-                if nv13.check_vc(box_but3):
-                    lucky = random.randrange(1, 100)
-                    global box_active3
-                    if 1 <= lucky <= 90:
-                        x3 = nv13.buff_speed(2)
-                        wind_but = Button(wind, w13_x - 60, 450, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active3 == 0:
-                        w13_x = finish
-                        boom_but3.draw_but(screen)
-                    box_active3 += 1
+                nv13.draw_nv(3)
+                if nv13.check_vc(box_but3) and box_touch[3] == 0: w13_x, x3 = lucky_atr(w13_x, x3, lucky3, nv13, 3)
+                if k_stun[3]: w13_x, k_stun[3] = stun_effect(w13_x, x3, k_stun[3], 450)
+                if rever[3]: w13_x -= 2 * x3
+                if tele[3]: tele[3] = tele_effect(tele[3], tele_x[3], lucky3 * 3, 450)
 
                 nv14 = nhanVat("nv14", w14_name[int(wi11)], w14_x, 550, 120, 120)
-                nv14.draw_nv()
-                if nv14.check_vc(box_but4):
-                    lucky = random.randrange(1, 100)
-                    global box_active4
+                nv14.draw_nv(4)
+                if nv14.check_vc(box_but4) and box_touch[4] == 0: w14_x, x4 = lucky_atr(w14_x, x4, lucky4, nv14, 4)
+                if k_stun[4]: w14_x, k_stun[4] = stun_effect(w14_x, x4, k_stun[4], 550)
+                if rever[4]: w14_x -= 2 * x4
+                if tele[4]: tele[4] = tele_effect(tele[4], tele_x[4], lucky4 * 3, 550)
 
-                    if 1 <= lucky <= 90:
-                        x4 = nv14.buff_speed(3)
-                        wind_but = Button(wind, w14_x - 60, 550, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active4 == 0:
-                        w14_x = finish
-                        boom_but4.draw_but(screen)
-                    box_active4 += 1
                 nv15 = nhanVat("nv15", w15_name[int(wi11)], w15_x, 650, 120, 120)
-                nv15.draw_nv()
-                if nv15.check_vc(box_but5):
-                    lucky = random.randrange(1, 100)
-                    global box_active5
-                    box_active = 0
-                    if 1 <= lucky <= 90:
-                        x5 = nv15.buff_speed(4)
-                        wind_but = Button(wind, w15_x - 60, 650, 100, 80)
-                        wind_but.draw_but(screen)
-                    if 90 < lucky <= 100 and box_active5 == 0:
-                        w15_x = finish
-                        boom_but4.draw_but(screen)
-                    box_active5 += 1
+                nv15.draw_nv(5)
+                if nv15.check_vc(box_but5) and box_touch[5] == 0: w15_x, x5 = lucky_atr(w15_x, x5, lucky5, nv15, 5)
+                if k_stun[5]: w15_x, k_stun[5] = stun_effect(w15_x, x5, k_stun[5], 650)
+                if rever[5]: w15_x -= 2 * x5
+                if tele[5]: tele[5] = tele_effect(tele[5], tele_x[5], lucky5 * 3, 650)
 
             list_x = [w11_x, w12_x, w13_x, w14_x, w15_x]
 
@@ -2401,10 +2530,6 @@ while True:
                     coin = (coin - int(bet))
 
             if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish:
-                exit_but.draw_but(screen)
-
-                if check_press(exit_but.image_rect, pos):
-                    off_screen_except(0.5)
 
                 s = podium.after_race(list_stt[0], list_stt[1], list_stt[2], list_stt[3], list_stt[4], choosen_set,
                                       screen,
@@ -2424,59 +2549,75 @@ while True:
         if check_press(exit_but.image_rect, pos):
             off_screen_except(0.5)
             time.sleep(0.2)
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - start_time
+        if elapsed_time < 1000:
+            background3.draw_bg(screen)
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("music/countdown1.mp3")
+            pygame.mixer.music.play(0)
+        elif elapsed_time < three_limit + 1000:
+            background3.draw_bg(screen)
+            three_but.draw_but(screen)
+        elif elapsed_time < two_limit + 1000:
+            background3.draw_bg(screen)
+            two_but.draw_but(screen)
+        elif elapsed_time < one_limit + 1000:
+            background3.draw_bg(screen)
+            one_but.draw_but(screen)
+        elif elapsed_time < time_limit + 1000:
+            background3.draw_bg(screen)
+            if lan:
+                start_but.draw_but(screen)
+            else:
+                start_butvn.draw_but(screen)
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("music/lucvodua2.mp3")
+            pygame.mixer.music.play(0)
+            w11_x = w12_x = w13_x = w14_x = w15_x = 1
+        else:
 
-        car1_but = Button(car1, w11_x, 225, 140, 90)
-        car2_but = Button(car2, w12_x, 325, 160, 90)
-        car3_but = Button(car3, w13_x, 450, 160, 90)
-        car4_but = Button(car4, w14_x, 550, 160, 90)
-        car5_but = Button(car5, w15_x, 675, 160, 90)
+            car1_obj = nhanVat("car1_obj", car1, w11_x, 225, 140, 90)
+            car1_obj.draw_nv(1)
+            if car1_obj.check_vc(box_but1) and box_touch[1] == 0: w11_x, x1 = lucky_atr(w11_x, x1, lucky1, car1_obj, 1)
+            if k_stun[1]: w11_x, k_stun[1] = stun_effect(w11_x, x1, k_stun[1], 225)
+            if rever[1]: w11_x -= 2 * x1
+            if tele[1]: tele[1] = tele_effect(tele[1], tele_x[1], lucky1 * 3, 225)
 
-        car1_but.draw_but(screen)
-        car2_but.draw_but(screen)
-        car3_but.draw_but(screen)
-        car4_but.draw_but(screen)
-        car5_but.draw_but(screen)
+            car2_obj = nhanVat("car2_obj", car2, w12_x, 325, 160, 90)
+            car2_obj.draw_nv(2)
+            if car2_obj.check_vc(box_but2) and box_touch[2] == 0: w12_x, x2 = lucky_atr(w12_x, x2, lucky2, car2_obj, 2)
+            if k_stun[2]: w12_x, k_stun[2] = stun_effect(w12_x, x2, k_stun[2], 325)
+            if rever[2]: w12_x -= 2 * x2
+            if tele[2]: tele[2] = tele_effect(tele[2], tele_x[2], lucky2 * 3, 325)
 
-        if car1_but.image_rect.colliderect(box_but1.image_rect):
-            bonus = random.randrange(1, 100)
-            if 1 < bonus < 70:
-                x1 = 1.2  # max speed
-            if 70 < bonus < 100:
-                x1 = 3
-        if car2_but.image_rect.colliderect(box_but2.image_rect):
-            bonus = random.randrange(1, 100)
-            if 1 < bonus < 70:
-                x2 = 1.2  # max speed
-            if 70 < bonus < 100:
-                x2 = 3
+            car3_obj = nhanVat("car3_obj", car3, w13_x, 450, 160, 90)
+            car3_obj.draw_nv(3)
+            if car3_obj.check_vc(box_but3) and box_touch[3] == 0: w13_x, x3 = lucky_atr(w13_x, x3, lucky3, car3_obj, 3)
+            if k_stun[3]: w13_x, k_stun[3] = stun_effect(w13_x, x3, k_stun[3], 450)
+            if rever[3]: w13_x -= 2 * x3
+            if tele[3]: tele[3] = tele_effect(tele[3], tele_x[3], lucky3 * 3, 450)
 
-        if car3_but.image_rect.colliderect(box_but3.image_rect):
-            bonus = random.randrange(1, 100)
-            if 1 < bonus < 70:
-                x3 = 1.2  # max speed
-            if 70 < bonus < 100:
-                x3 = 3
+            car4_obj = nhanVat("car4_obj", car4, w14_x, 550, 160, 90)
+            car4_obj.draw_nv(4)
+            if car4_obj.check_vc(box_but4) and box_touch[4] == 0: w14_x, x4 = lucky_atr(w14_x, x4, lucky4, car4_obj, 4)
+            if k_stun[4]: w14_x, k_stun[4] = stun_effect(w14_x, x4, k_stun[4], 550)
+            if rever[4]: w14_x -= 2 * x4
+            if tele[4]: tele[4] = tele_effect(tele[4], tele_x[4], lucky4 * 3, 550)
 
-        if car4_but.image_rect.colliderect(box_but4.image_rect):
-            bonus = random.randrange(1, 100)
-            if 1 < bonus < 70:
-                x4 = 1.2  # max speed
-            if 70 < bonus < 100:
-                x4 = 3
+            car5_obj = nhanVat("car5_obj", car5, w15_x, 675, 160, 90)
+            car5_obj.draw_nv(5)
+            if car5_obj.check_vc(box_but5) and box_touch[5] == 0: w15_x, x5 = lucky_atr(w15_x, x5, lucky5, car5_obj, 5)
+            if k_stun[5]: w15_x, k_stun[5] = stun_effect(w15_x, x5, k_stun[5], 650)
+            if rever[5]: w15_x -= 2 * x5
+            if tele[5]: tele[5] = tele_effect(tele[5], tele_x[5], lucky5 * 3, 650)
 
-        if car5_but.image_rect.colliderect(box_but5.image_rect):
-            bonus = random.randrange(1, 100)
-            if 1 < bonus < 70:
-                x5 = 1.2  # max speed
-            if 70 < bonus < 100:
-                x5 = 3
-
-        if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
-            off_screen_except(8)
-            background6.draw_bg(screen)
-            exit_but.draw_but(screen)
-            if check_press(exit_but.image_rect, pos):
-                off_screen_except(0.5)
+            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
+                off_screen_except(8)
+                background6.draw_bg(screen)
+                exit_but.draw_but(screen)
+                if check_press(exit_but.image_rect, pos):
+                    off_screen_except(0.5)
     if lang:
         language_screen()
     if minigame_bool:
