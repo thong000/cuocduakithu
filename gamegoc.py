@@ -1,5 +1,5 @@
 import os
-
+import textwrap
 import pygame
 import random
 import subprocess
@@ -13,14 +13,14 @@ import Rule
 import podium
 import screenshot
 import shutil
+import re
 
 pygame.init()
 pygame.mixer.init()
-
+write_history_active = True
 with open('user.txt', 'r') as file:
     user = file.read()
 
-print(user)
 # Mở file lan để xác định ngôn ngữ
 with open('lan.txt', 'r') as file:
     l = file.read()
@@ -41,6 +41,38 @@ with open('log.txt', 'r') as file:
 with open("account/" + str(user) + '/coin.txt', 'r') as c:
     global coin
     coin = int(c.read())
+
+
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        text=file.read()
+        numbers = re.findall(r'\d+', text)
+        numeric_values = [int(number) for number in numbers]
+        return numeric_values[0]
+def read_file2(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+    return lines
+
+def draw_text_list(screen, text_list, font, scroll_y):
+    bg_history = pygame.image.load("background/menugamemap.png")
+    bg_history = pygame.transform.scale(bg_history, (1344, 756))
+    screen.blit(bg_history, (0, 0))
+    column_width = 200  # Độ rộng của mỗi cột
+
+    # Can giữ và vẽ từng dòng trong danh sách
+    for i, line in enumerate(text_list):
+        columns = line.strip().split(',')  # Phân chia dòng thành các cột
+        for j, column in enumerate(columns):
+            wrapped_lines = textwrap.wrap(column, width=22)  # Can giữ với chiều rộng tối đa 15 ký tự
+            for k, wrapped_line in enumerate(wrapped_lines):
+                text_surface = font.render(wrapped_line, True, (0, 0, 0))  # Màu chữ đen
+                x_position = j * column_width + 100  # Vị trí của mỗi cột
+                y_position = i * 20 + k * 20 - scroll_y  # Vị trí của mỗi dòng con trong cột, điều chỉnh theo lăn chuột
+                screen.blit(text_surface, (x_position, y_position))
+
+    pygame.display.flip()
+
 
 # Thông số cơ bản
 SCREEN_WIDTH = 1344
@@ -100,6 +132,7 @@ chonnv1 = False
 chonnv2 = False
 choosenv_bool3 = False
 ketqua = False
+history_bool = False
 
 # Thiết lập màn hình
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -143,8 +176,29 @@ buff = 0
 # finish game
 game_finish = 0
 
+from datetime import datetime
+
 
 # Các class
+def write_history(nv, result, bet, earn):
+    current_date = datetime.now().date()
+    formatted_date = current_date.strftime("%d/%m/%Y")
+    current_time = datetime.now()
+    hour = current_time.hour
+    minute = current_time.minute
+
+    time = str(hour) + "h" + str(minute) + "p" + "-" + str(formatted_date)
+
+    stt=int(read_file("account/" + str(user) + "/stt.txt"))
+    global write_history_active
+    if write_history_active:
+        with open('account/' + str(user) + '/stt.txt', 'w') as file:
+            file.write(str(int(stt) + 1))
+            write_history_active = False
+    with open('account/' + str(user) + '/history.txt', 'a') as file:
+        file.write(
+            str(int(stt)) + ',' + str(nv) + ',' + str(result) + ',' + str(bet) + ',' + str(earn) + ',' + str(time))
+        file.write('\n')
 
 
 class Background:
@@ -961,6 +1015,9 @@ head53 = pygame.image.load("head/Dau nv/Set5/nv3.png")
 head54 = pygame.image.load("head/Dau nv/Set5/nv4.png")
 head55 = pygame.image.load("head/Dau nv/Set5/nv5.png")
 
+history = pygame.image.load("Button/history.png")
+history_but = Button(history, 650, 720, 150, 65)
+
 # Set text
 chooseMap_text = Text(game_font1, "Choose the map", 255, 255, 255)
 chooseMapvn_text = Text(game_font1, "Chọn bản đồ", 255, 255, 255)
@@ -1009,7 +1066,7 @@ def check_hover(rect, pos):
 
 def off_screen_except(x):
     global set_, wait, set1, set2, set3, setting_bool, result, lang, start_bool, minigame_bool, rule_bool, choosenv_bool1
-    global setnv11, setnv21, choosenv_bool2, setnv12, setnv22, flap, chonnv1, chonnv2, choosenv_bool3, ketqua
+    global setnv11, setnv21, choosenv_bool2, setnv12, setnv22, flap, chonnv1, chonnv2, choosenv_bool3, ketqua, history_bool
     set_ = False  # menu
     wait = False  # chon map
     set1 = False  # map1
@@ -1031,6 +1088,7 @@ def off_screen_except(x):
     chonnv2 = False
     choosenv_bool3 = False
     ketqua = False
+    history_bool = False
 
     if x == 0: set_ = True
     if x == 1: set1 = True
@@ -1049,6 +1107,7 @@ def off_screen_except(x):
     if x == 16: flap = True
     if x == 21: choosenv_bool3 = True
     if x == 22: ketqua = True
+    if x == 23: history_bool = True
     if x == 0.5: wait = True
 
 
@@ -1100,8 +1159,9 @@ def account_login():
 
 r = g = b = 255
 
+
 def menu_screen():
-    global  r,g,b
+    global r, g, b
     global get_coin  # check xem co cong coin khi thang chua
     get_coin = False
 
@@ -1118,6 +1178,10 @@ def menu_screen():
         setting_but.draw_but(screen)
         minigame_but.draw_but(screen)
         rule_but.draw_but(screen)
+        history_but.draw_but(screen)
+
+        if check_press(history_but.image_rect, pos):
+            off_screen_except(23)
 
         if check_press(play_but.image_rect, pos):
             off_screen_except(0.5)
@@ -1135,14 +1199,14 @@ def menu_screen():
         store.Store(lan, 1344 // 2, 768 // 2)
     else:
         background.draw_bg(screen)
-        Vie_text = Text(game_font1, "VIE",abs(255 - r),abs(255 - g), abs(255 - b))
-        Eng_text = Text(game_font1, "ENG", r, g,b)
+        Vie_text = Text(game_font1, "VIE", abs(255 - r), abs(255 - g), abs(255 - b))
+        Eng_text = Text(game_font1, "ENG", r, g, b)
         Vie_text.draw_text(screen, 100, 710)
         Eng_text.draw_text(screen, 180, 710)
         if pygame.rect.Rect(100, 710, 60, 30).collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1:
                 r = g = b = 0
-                with open('lan.txt','w') as file:
+                with open('lan.txt', 'w') as file:
                     file.write("0")
         if pygame.rect.Rect(180, 710, 60, 30).collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1:
@@ -1169,8 +1233,6 @@ def menu_screen():
     wi13 = 0
     wi14 = 0
     wi15 = 0
-
-
 
 
 def minigame_screen():
@@ -1519,12 +1581,13 @@ def choose_nv_screen1():
     next_but = Button(next_img, 1200, 720, 100, 50)
     if bet != "" and int(bet) <= int(coin) and nv != "" and 1 <= int(nv) <= 5:
         next_but.draw_but(screen)
-        next_but.draw_but(screen)
         if check_press(next_but.image_rect, pos):
+            global write_history_active
+            write_history_active = True
             if setnv11:
+                write_history_active = True
                 global i
                 i = 1
-                global box_active1, box_active2, box_active3, box_active4, box_active5
                 box_active1 = box_active2 = box_active3 = box_active4 = box_active5 = 0
                 global time_limit, start_time
                 global three_limit, two_limit, one_limit
@@ -1536,6 +1599,7 @@ def choose_nv_screen1():
                 off_screen_except(1)
                 setnv11 = True
             if setnv21:
+                write_history_active = True
                 i = 1
                 global box_active41, box_active42, box_active43, box_active44, box_active45
                 box_active41 = box_active42 = box_active43 = box_active44 = box_active45 = 0
@@ -2120,6 +2184,12 @@ def ketqua_screen():
     if check_press(save_but.image_rect, pos):
         screenshot.save_screenshot("temp.png", "temp.docx")
         time.sleep(0.5)
+    exit_but.draw_but(screen)
+    if check_press(exit_but.image_rect, pos):
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load("music/nhacnengame.mp3")
+        pygame.mixer.music.play(-1)
+        off_screen_except(0)
 
 
 set1_info = pygame.image.load("nvinfo/info1.png")
@@ -2244,6 +2314,7 @@ def first_login_screen(lan, i, screen):
         A[i].draw_bg(screen)
 
 
+scroll_y = 0
 while True:
     with open('user.txt', 'r') as file:
         user = file.read()
@@ -2255,7 +2326,6 @@ while True:
 
     global pos
     pos = pygame.mouse.get_pos()
-    print(pos)
 
     S_nv1 = Text(game_font2, str(int(w11_x / 5)), 0, 0, 0)
     S_nv2 = Text(game_font2, str(int(w12_x / 5)), 0, 0, 0, )
@@ -2526,6 +2596,9 @@ while True:
             boom_but5 = Button(boom, box_but5.x, 660, 90, 90)
             map1(pos)
             if check_press(exit_but.image_rect, pos):
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load("music/nhacnengame.mp3")
+                pygame.mixer.music.play(-1)
                 off_screen_except(0.5)
                 time.sleep(0.2)
 
@@ -2615,13 +2688,22 @@ while True:
                     list_nv_win[i] = 1
 
             if len(list_stt):
-                if (nv == list_stt[0] or nv2 == list_stt[0]) and get_coin == False:
+                if nv == list_stt[0] and get_coin == False:
                     coin = int((int(coin) - int(bet)) + int(bet) * 4)
-                    with open('account/'+str(user)+'/history') as file:
-                        file.write()
+                    write_history(str(int(nv)), "win", bet, 3 * int(bet))
                     get_coin = True
-                if ((nv != list_stt[0]) and (nv2 == list_stt[0])) and get_coin == False:
+                if nv != list_stt[0] and get_coin == False:
                     coin = int((coin - int(bet)))
+                    write_history(str(int(nv)), "lose", bet, -int(bet))
+                    get_coin = True
+                if nv2 == list_stt[0] and get_coin == False:
+                    coin = int((int(coin) - int(bet)) + int(bet) * 4)
+                    write_history(str(nv2), "win", bet, 3 * int(bet))
+                    get_coin = True
+                if nv2 != list_stt[0] and get_coin == False:
+                    coin = int((coin - int(bet)))
+                    write_history(str(nv2), "lose", bet, -int(bet))
+                    get_coin = True
 
             if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish:
 
@@ -2711,6 +2793,9 @@ while True:
                 background6.draw_bg(screen)
                 exit_but.draw_but(screen)
                 if check_press(exit_but.image_rect, pos):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load("music/nhacnengame.mp3")
+                    pygame.mixer.music.play(-1)
                     off_screen_except(0.5)
     if lang:
         language_screen()
@@ -2745,6 +2830,19 @@ while True:
 
     if ketqua:
         ketqua_screen()
+    if history_bool:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:  # Bắt sự kiện lăn lên
+                scroll_y += 20  # Điều chỉnh vị trí lên
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:  # Bắt sự kiện lăn xuống
+                scroll_y -= 20  # Điều chỉnh vị trí xuống
+        font = pygame.font.Font(None, 24)
+        text_list=read_file2('account/'+str(user)+'/history.txt')
+        scroll_y = max(0, min(scroll_y, len(text_list) * 20 * len(max(text_list, key=len))))
+        draw_text_list(screen, text_list, font, scroll_y)
+        exit_but.draw_but(screen)
+        if check_press(exit_but.image_rect, pos):
+            off_screen_except(0)
 
     pygame.display.update()
     clock.tick(60)

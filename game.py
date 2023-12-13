@@ -1017,8 +1017,6 @@ choose_set1vn_but = Button(choose_set1vn, SCREEN_WIDTH // 2, 50, 250, 130)
 choose_set2_but = Button(choose_set2, SCREEN_WIDTH // 5, 50, 250, 130)
 choose_set2vn_but = Button(choose_set1vn, SCREEN_WIDTH // 5, 50, 250, 130)
 
-boom = pygame.image.load("hieuung\\boom.png")
-wind = pygame.image.load("hieuung\gio.png")
 
 minigame = pygame.image.load("Button\minigame.png")
 minigame_but = Button(minigame, 300, 712, 160, 60)

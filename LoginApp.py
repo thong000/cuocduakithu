@@ -76,7 +76,7 @@ class LoginApp(App):
                         # History
                         if not os.path.exists("account/" + str(name) + "/history.txt"):
                             with open("account/" + str(name) + "/history.txt", 'w') as file:
-                                file.write("")
+                                file.write("stt,nhan vat,ket qua,tien cuoc,tien nhan duoc,thoi gian")
 
                         # Kiem tra dang nhap
                         message = "Login Success!"
@@ -90,6 +90,11 @@ class LoginApp(App):
                         with open('user.txt', 'w') as file:
                             file.write(name)
 
+                        #Stt của lịch sử
+                        if not os.path.exists("account/" + str(name) + "/stt.txt"):
+                            with open("account/" + str(name) + "/stt.txt", 'w') as file:
+                                file.write("1")
+
                         # screenshot
                         if not os.path.exists("account/" + str(name) + "/screenshot.docx"):
                             with open("account/" + str(name) + "/screenshot.docx", 'w') as file:
@@ -97,6 +102,9 @@ class LoginApp(App):
                             # Xem có phải lần đầu đăng nhập không
                             with open('first_log.txt', 'w') as file:
                                 file.write("1")
+
+
+
 
             else:
                 message = "User name doesn't exit"

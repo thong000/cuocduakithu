@@ -1,0 +1,7 @@
+stt,nhan vat,ket qua,tien cuoc,tien nhan duoc,thoi gian
+1,2,lose,4,-4,21h48p-13/12/20231
+2,2,win,4,12,22h47p-13/12/2023
+3,2,lose,43,-43,22h52p-13/12/2023
+4,1,lose,4,-4,22h54p-13/12/2023
+5,1,lose,5,-5,22h55p-13/12/2023
+6,1,lose,4,-4,22h57p-13/12/2023
