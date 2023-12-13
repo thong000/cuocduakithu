@@ -82,7 +82,8 @@ class RegistrationApp(App):
     def register(self, instance):
 
         # collect information
-
+        if not os.path.exists("account/"+str(self.name_input.text)):
+            os.makedirs("account/"+str(self.name_input.text))
         name = self.name_input.text
 
         email = self.email_input.text
@@ -91,8 +92,8 @@ class RegistrationApp(App):
 
         confirm_password = self.confirm_input.text
 
-        filename_username = name + ".txt"
-        filename_email = email + ".txt"
+        filename_username = "account/" + str(name) + "/info.txt"
+        filename_email = "account/" + str(name) + "/" + email + ".txt"
 
         # validation
 
@@ -188,7 +189,7 @@ class RegistrationApp(App):
 
         else:
 
-            filename_username = name + '.txt'
+            filename_username = "account/" + name + "/info.txt"
 
             user_dictionary = {
 
@@ -205,7 +206,7 @@ class RegistrationApp(App):
                 for i in user_dictionary:
                     file.write(i + ": " + user_dictionary[i] + "\n")
 
-            filename_email = email + ".txt"
+            filename_email = "account/" + str(name) + "/" + email + ".txt"
             user_email = {
 
                 "Email": email

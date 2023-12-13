@@ -41,9 +41,6 @@ def check_press(rect, pos):
             return False
 
 
-
-
-
 def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_height):
     """
     đưa vào số thứ tự của thằng đứng thứ 1 -> 5, set nhân vật được chọn 
@@ -100,14 +97,14 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
         image = pygame.transform.flip(image, rotate, False)
         sur.blit(image, (x, y))
         return cur_frame
+
     off_screen = 0
-    while True and off_screen==0:
+    while True and off_screen == 0:
         sur.blit(bg, (0, 0))
         mouse_pos = pygame.mouse.get_pos()
         next_but.draw_but(sur)
         if check_press(next_but.image_rect, mouse_pos):
-            off_screen=22
-
+            off_screen = 22
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

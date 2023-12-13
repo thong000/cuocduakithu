@@ -143,15 +143,15 @@ class Store:
 
                 if k1 and self.buy1 and int(money) >= 20:
                     self.buy1 = False
-                    money -= 20
+                    money = int(money)-20
                     buff += 0.1
                 elif k2 and self.buy2 and int(money) >= 35:
                     self.buy2 = False
-                    money -= 35
+                    money = int(money)-35
                     buff += 0.2
                 elif k3 and self.buy3 and int(money) >= 45:
                     self.buy3 = False
-                    money -= 45
+                    money = int(money)-45
                     buff += 0.3
                 muado.play()
 

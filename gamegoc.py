@@ -1,3 +1,5 @@
+import os
+
 import pygame
 import random
 import subprocess
@@ -9,11 +11,16 @@ import Snake_game_class
 import store_func
 import Rule
 import podium
-import os
-import menu_music
+import screenshot
+import shutil
 
 pygame.init()
 pygame.mixer.init()
+
+with open('user.txt', 'r') as file:
+    user = file.read()
+
+print(user)
 # Mở file lan để xác định ngôn ngữ
 with open('lan.txt', 'r') as file:
     l = file.read()
@@ -31,7 +38,7 @@ with open('log.txt', 'r') as file:
         lock = False
 
 # Mở file coin
-with open('coin.txt', 'r') as c:
+with open("account/" + str(user) + '/coin.txt', 'r') as c:
     global coin
     coin = int(c.read())
 
@@ -222,6 +229,26 @@ class nhanVat:
         if 50 <= bonus_tuple[i] <= 100:
             return 1.2
 
+
+onevn = pygame.image.load("NPC/Vie/20.png")
+twovn = pygame.image.load("NPC/Vie/21.png")
+threevn = pygame.image.load("NPC/Vie/23.png")
+fourvn = pygame.image.load("NPC/Vie/25.png")
+fivevn = pygame.image.load("NPC/Vie/27.png")
+sixvn = pygame.image.load("NPC/Vie/29.png")
+A = [onevn, twovn, threevn, fourvn, fivevn, sixvn]
+for i in range(0, 6, 1):
+    A[i] = Background(A[i])
+
+one = pygame.image.load("NPC/Eng/19.png")
+two = pygame.image.load("NPC/Eng/22.png")
+three = pygame.image.load("NPC/Eng/24.png")
+four = pygame.image.load("NPC/Eng/26.png")
+five = pygame.image.load("NPC/Eng/28.png")
+six = pygame.image.load("NPC/Eng/30.png")
+B = [one, two, three, four, five, six]
+for j in range(0, 6, 1):
+    B[j] = Background(B[j])
 
 win = pygame.image.load("end/win.png")
 lose = pygame.image.load("end/lose.png")
@@ -1053,6 +1080,7 @@ def account_login():
         background.draw_bg(screen)
         play_but.draw_but(screen)
         setting_but.draw_but(screen)
+
     else:
         background.draw_bg(screen)
         if lan:
@@ -1070,7 +1098,10 @@ def account_login():
             subprocess.run(["python", "LoginApp.py"])
 
 
+r = g = b = 255
+
 def menu_screen():
+    global  r,g,b
     global get_coin  # check xem co cong coin khi thang chua
     get_coin = False
 
@@ -1100,11 +1131,28 @@ def menu_screen():
             minigame_screen()
         if check_press(rule_but.image_rect, pos):
             off_screen_except(11)
+        store = store_func
+        store.Store(lan, 1344 // 2, 768 // 2)
     else:
         background.draw_bg(screen)
+        Vie_text = Text(game_font1, "VIE",abs(255 - r),abs(255 - g), abs(255 - b))
+        Eng_text = Text(game_font1, "ENG", r, g,b)
+        Vie_text.draw_text(screen, 100, 710)
+        Eng_text.draw_text(screen, 180, 710)
+        if pygame.rect.Rect(100, 710, 60, 30).collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1:
+                r = g = b = 0
+                with open('lan.txt','w') as file:
+                    file.write("0")
+        if pygame.rect.Rect(180, 710, 60, 30).collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1:
+                r = g = b = 255
+                with open('lan.txt', 'w') as file:
+                    file.write("1")
         if lan:
             signup_but.draw_but(screen)
             login_but.draw_but(screen)
+
         else:
             signupvn_but.draw_but(screen)
             loginvn_but.draw_but(screen)
@@ -1122,8 +1170,7 @@ def menu_screen():
     wi14 = 0
     wi15 = 0
 
-    store = store_func
-    store.Store(lan, 1344 // 2, 768 // 2)
+
 
 
 def minigame_screen():
@@ -1135,15 +1182,15 @@ def minigame_screen():
     flappy_bird_but.draw_but(screen)
 
     if check_press(flappy_bird_but.image_rect, pos):
-        coin = PlappyBird.play(coin)
+        coin = int(PlappyBird.play(coin))
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     if check_press(snake_but.image_rect, pos):
-        coin = Snake_game_class.play(coin)
+        coin = int(Snake_game_class.play(coin))
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     if check_press(fruit_but.image_rect, pos):
-        coin = Fruit_ninja.play(coin)
+        coin = int(Fruit_ninja.play(coin))
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     exit_but.draw_but(screen)
@@ -1248,6 +1295,26 @@ def setting_screen():
         languagevn_but.draw_but(screen)
 
     if check_press(logout_but.image_rect, pos):
+
+        directory_path = "account/" + str(user) + "/"
+
+        # Cấp quyền truy cập cho thư mục
+        try:
+            # Set quyền truy cập cho owner (người sở hữu)
+            os.chmod(directory_path, 0o700)  # Ví dụ: 0o700 là quyền truy cập đầy đủ cho owner
+
+            # Set quyền truy cập cho group (nhóm)
+            # os.chmod(directory_path, 0o770)  # Ví dụ: 0o770 là quyền truy cập đầy đủ cho owner và group
+
+            # Set quyền truy cập cho others (người khác)
+            # os.chmod(directory_path, 0o777)  # Ví dụ: 0o777 là quyền truy cập đầy đủ cho tất cả mọi người
+        except OSError as e:
+            pass
+
+        # Sao chép các hình anh tạm vào file ảnh trong account
+        shutil.copy("temp.docx", "account/" + str(user) + "/screenshot.docx")
+        # Xóa nội dung file tạm
+        clear_word_file("temp.docx")
         with open('log.txt', 'w') as file:
             file.write('0')
         off_screen_except(0)
@@ -1450,7 +1517,7 @@ def choose_nv_screen1():
     pygame.display.update()
 
     next_but = Button(next_img, 1200, 720, 100, 50)
-    if bet != "" and int(bet) <= coin and nv != "" and 1 <= int(nv) <= 5:
+    if bet != "" and int(bet) <= int(coin) and nv != "" and 1 <= int(nv) <= 5:
         next_but.draw_but(screen)
         next_but.draw_but(screen)
         if check_press(next_but.image_rect, pos):
@@ -2016,6 +2083,28 @@ list_stt = []
 shop = store_func.Store(lan, 1344, 768)
 get_coin = False
 
+save = pygame.image.load("Button/save_ but.png")
+save_but = Button(save, 1300, 720, 80, 80)
+from docx import Document
+
+
+def clear_word_file(file_path):
+    # Mở tệp Word
+    doc = Document(file_path)
+
+    # Xóa tất cả các đoạn văn bản trong tài liệu
+    for paragraph in doc.paragraphs:
+        paragraph.clear()
+
+    # Xóa tất cả các bảng trong tài liệu
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                cell.clear()
+
+    # Lưu lại tệp Word đã xóa sạch
+    doc.save(file_path)
+
 
 def ketqua_screen():
     if lan:
@@ -2026,6 +2115,11 @@ def ketqua_screen():
         result_screen = pygame.image.load("15.png")
         result_screen_bg = Background(result_screen)
         result_screen_bg.draw_bg(screen)
+    pygame.image.save(screen, "temp.png")  # Chụp trước khi vẽ nút save
+    save_but.draw_but(screen)
+    if check_press(save_but.image_rect, pos):
+        screenshot.save_screenshot("temp.png", "temp.docx")
+        time.sleep(0.5)
 
 
 set1_info = pygame.image.load("nvinfo/info1.png")
@@ -2141,15 +2235,27 @@ play_background_music("music/nhacnengame.mp3")
 reset()
 k_stun = 0
 music = 0
-while True:
 
+
+def first_login_screen(lan, i, screen):
+    if lan:
+        B[i].draw_bg(screen)
+    else:
+        A[i].draw_bg(screen)
+
+
+while True:
     with open('user.txt', 'r') as file:
         user = file.read()
-    print(user)
+    with open("account/" + str(user) + '/coin.txt', 'r') as file:
+        coin = int(file.read())
+    with open('first_log.txt', 'r') as file:
+        if str(file.read()) == "1":
+            log_1st = True
 
     global pos
     pos = pygame.mouse.get_pos()
-    # print(pos)
+    print(pos)
 
     S_nv1 = Text(game_font2, str(int(w11_x / 5)), 0, 0, 0)
     S_nv2 = Text(game_font2, str(int(w12_x / 5)), 0, 0, 0, )
@@ -2203,13 +2309,14 @@ while True:
             sys.exit()
 
     if set_:
-
         menu_screen()
         music = 0
+
         store_img = pygame.image.load("extra_stuff/store/store.png")
         store = Button(store_img, 1200, 650, 200, 200)
-        store.draw_but(screen)
-        if check_press(store.image_rect, pos):
+        if lock:
+            store.draw_but(screen)
+        if check_press(store.image_rect, pos) and lock:
             pygame.mixer.music.stop()
             pygame.mixer.music.load("music/nhac nen mua do.mp3")
             pygame.mixer.music.play(-1)
@@ -2219,9 +2326,9 @@ while True:
                 shop.buy3 = True
                 game_finish = 0
             buff, coin = shop.running(screen, coin, 1344, 768)
-        coin_but.draw_but(screen)
-        coin_text = Text(game_font1, str(coin), 255, 200, 60)
-        coin_text.draw_text(screen, 1130, -6)
+            coin_but.draw_but(screen)
+            coin_text = Text(game_font1, str(coin), 255, 200, 60)
+            coin_text.draw_text(screen, 1130, -6)
 
     if wait:
         wait_screen()
@@ -2363,32 +2470,17 @@ while True:
                     coin = (coin - int(bet))
                     get_coin = True
 
-            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish+30:
-                exit_but.draw_but(screen)
+            if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 30:
                 if i == 0:
                     start_t = pygame.time.get_ticks()
                     i += 0.1
 
-                if nv == list_stt[0]:
-                    cur_time = pygame.time.get_ticks()
-                    if cur_time - start_t < 10000:
-                        win_but = Button(win, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-                        win_but.draw_but(screen)
-                        time.sleep(1)
-                else:
-                    print(start_t)
-                    cur_time = pygame.time.get_ticks()
-                    if cur_time - start_t < 10000:
-                        lose_but = Button(lose, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 200, 200)
-                        lose_but.draw_but(screen)
-                        time.sleep(1)
                 if check_press(exit_but.image_rect, pos):
                     off_screen_except(0.5)
 
                 s = podium.after_race(list_stt[0], list_stt[1], list_stt[2], list_stt[3], list_stt[4], choosen_set,
                                       screen,
                                       SCREEN_WIDTH, SCREEN_HEIGHT)
-
 
                 next_but = Button(next_img, 1200, 720, 100, 50)
                 next_but.draw_but(screen)
@@ -2524,10 +2616,12 @@ while True:
 
             if len(list_stt):
                 if (nv == list_stt[0] or nv2 == list_stt[0]) and get_coin == False:
-                    coin = (coin - int(bet)) + int(bet) * 4
+                    coin = int((int(coin) - int(bet)) + int(bet) * 4)
+                    with open('account/'+str(user)+'/history') as file:
+                        file.write()
                     get_coin = True
                 if ((nv != list_stt[0]) and (nv2 == list_stt[0])) and get_coin == False:
-                    coin = (coin - int(bet))
+                    coin = int((coin - int(bet)))
 
             if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish:
 
@@ -2651,7 +2745,8 @@ while True:
 
     if ketqua:
         ketqua_screen()
+
     pygame.display.update()
     clock.tick(60)
-    with open('coin.txt', 'w') as c:
+    with open("account/" + str(user) + '/coin.txt', 'w') as c:
         c.write(str(coin))
