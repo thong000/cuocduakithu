@@ -45,14 +45,17 @@ with open("account/" + str(user) + '/coin.txt', 'r') as c:
 
 def read_file(file_path):
     with open(file_path, 'r') as file:
-        text=file.read()
+        text = file.read()
         numbers = re.findall(r'\d+', text)
         numeric_values = [int(number) for number in numbers]
         return numeric_values[0]
+
+
 def read_file2(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
     return lines
+
 
 def draw_text_list(screen, text_list, font, scroll_y):
     bg_history = pygame.image.load("background/menugamemap.png")
@@ -189,7 +192,7 @@ def write_history(nv, result, bet, earn):
 
     time = str(hour) + "h" + str(minute) + "p" + "-" + str(formatted_date)
 
-    stt=int(read_file("account/" + str(user) + "/stt.txt"))
+    stt = int(read_file("account/" + str(user) + "/stt.txt"))
     global write_history_active
     if write_history_active:
         with open('account/' + str(user) + '/stt.txt', 'w') as file:
@@ -1635,16 +1638,23 @@ def choose_nv_screen2():
         time.sleep(0.2)
 
     if not s1_active:
+        global finish
+        finish = 1250
         Size1.draw_text(screen, 200, 600)
     else:
+        finish = 1180
         size1_active.draw_text(screen, 200, 600)
     if not s2_active:
+        finish = 1100
         Size2.draw_text(screen, 100, 600)
+        global background2
+        background2 = background2_lv2
     else:
         size2_active.draw_text(screen, 100, 600)
     if not s3_active:
         Size3.draw_text(screen, 0, 600)
     else:
+        background2 = background2_lv3
         size3_active.draw_text(screen, 0, 600)
 
     for event in pygame.event.get():
@@ -1851,18 +1861,24 @@ def choose_nv_screen3():
             s2_active = False
 
     if not s1_active:
+        global finish
+        finish = 1250
         Size1.draw_text(screen, 200, 600)
     else:
+        finish = 1180
         size1_active.draw_text(screen, 200, 600)
     if not s2_active:
+        finish = 1100
         Size2.draw_text(screen, 100, 600)
+        global background3
+        background3 = background3_lv3
     else:
         size2_active.draw_text(screen, 100, 600)
     if not s3_active:
         Size3.draw_text(screen, 0, 600)
     else:
+        background3 = background3_lv3
         size3_active.draw_text(screen, 0, 600)
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -2190,6 +2206,10 @@ def ketqua_screen():
         pygame.mixer.music.load("music/nhacnengame.mp3")
         pygame.mixer.music.play(-1)
         off_screen_except(0)
+    global list_nv_win,list_ranking,list_stt
+    list_nv_win = [0, 0, 0, 0, 0]
+    list_ranking = []
+    list_stt = []
 
 
 set1_info = pygame.image.load("nvinfo/info1.png")
@@ -2533,11 +2553,17 @@ while True:
                     list_nv_win[i] = 1
 
             if len(list_stt):
-                if (nv2 == list_stt[0] or nv2 == list_stt[0]) and get_coin == False:
-                    coin = (coin - int(bet)) + int(bet) * 4
+                if setnv12:
+                    sttnv = 10
+                if setnv22:
+                    sttnv = 15
+                if nv2 == list_stt[0] and get_coin == False:
+                    coin = int((int(coin) - int(bet)) + int(bet) * 4)
+                    write_history(str(nv2 + sttnv), "win", bet, 3 * int(bet))
                     get_coin = True
-                if ((nv != list_stt[0]) and (nv2 == list_stt[0])) and get_coin == False:
-                    coin = (coin - int(bet))
+                if nv2 != list_stt[0] and get_coin == False:
+                    coin = int((coin - int(bet)))
+                    write_history(str(nv2 + sttnv), "lose", bet, -int(bet))
                     get_coin = True
 
             if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 30:
@@ -2556,10 +2582,7 @@ while True:
                 next_but.draw_but(screen)
                 if check_press(next_but.image_rect, pos):
                     off_screen_except(s)
-                exit_but.draw_but(screen)
-                list_nv_win = [0, 0, 0, 0, 0]
-                list_ranking = []
-                list_stt = []
+
     if set1:
         current_time = pygame.time.get_ticks()
         elapsed_time = current_time - start_time
@@ -2688,22 +2711,26 @@ while True:
                     list_nv_win[i] = 1
 
             if len(list_stt):
+                if setnv21:
+                    sttnv = 5
+                if setnv11:
+                    sttnv = 0
                 if nv == list_stt[0] and get_coin == False:
                     coin = int((int(coin) - int(bet)) + int(bet) * 4)
-                    write_history(str(int(nv)), "win", bet, 3 * int(bet))
+                    write_history(str(int(nv + sttnv)), "win", bet, 3 * int(bet))
                     get_coin = True
                 if nv != list_stt[0] and get_coin == False:
                     coin = int((coin - int(bet)))
-                    write_history(str(int(nv)), "lose", bet, -int(bet))
+                    write_history(str(int(nv + sttnv)), "lose", bet, -int(bet))
                     get_coin = True
-                if nv2 == list_stt[0] and get_coin == False:
+                '''if nv2 == list_stt[0] and get_coin == False:
                     coin = int((int(coin) - int(bet)) + int(bet) * 4)
                     write_history(str(nv2), "win", bet, 3 * int(bet))
                     get_coin = True
                 if nv2 != list_stt[0] and get_coin == False:
                     coin = int((coin - int(bet)))
                     write_history(str(nv2), "lose", bet, -int(bet))
-                    get_coin = True
+                    get_coin = True'''
 
             if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish:
 
@@ -2715,10 +2742,7 @@ while True:
                 next_but.draw_but(screen)
                 if check_press(next_but.image_rect, pos):
                     off_screen_except(s)
-                exit_but.draw_but(screen)
-                list_nv_win = [0, 0, 0, 0, 0]
-                list_ranking = []
-                list_stt = []
+
 
     if set3:
         map3(pos)
@@ -2788,15 +2812,34 @@ while True:
             if rever[5]: w15_x -= 2 * x5
             if tele[5]: tele[5] = tele_effect(tele[5], tele_x[5], lucky5 * 3, 650)
 
+            list_x = [w11_x, w12_x, w13_x, w14_x, w15_x]
+
+            for i in range(5):
+                if list_x[i] > finish and list_nv_win[i] == 0:
+                    '''list_ranking.append("set01/PNG" + str(i + 1) + ".png")'''
+                    list_stt.append(i + 1)
+                    list_nv_win[i] = 1
+
+            if len(list_stt):
+                if nv3 == list_stt[0] and get_coin == False:
+                    coin = int((int(coin) - int(bet)) + int(bet) * 4)
+                    write_history(str(int(nv3 + 20)), "win", bet, 3 * int(bet))
+                    get_coin = True
+                if nv3 != list_stt[0] and get_coin == False:
+                    coin = int((coin - int(bet)))
+                    write_history(str(int(nv3 + 20)), "lose", bet, -int(bet))
+                    get_coin = True
+
             if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 10:
-                off_screen_except(8)
                 background6.draw_bg(screen)
+                next_but = Button(next_img, 1200, 720, 100, 50)
+                next_but.draw_but(screen)
+                if check_press(next_but.image_rect, pos):
+                    off_screen_except(22)
                 exit_but.draw_but(screen)
-                if check_press(exit_but.image_rect, pos):
-                    pygame.mixer.music.stop()
-                    pygame.mixer.music.load("music/nhacnengame.mp3")
-                    pygame.mixer.music.play(-1)
-                    off_screen_except(0.5)
+                if check_press(exit_but.image_rect,pos):
+                    off_screen_except(0)
+
     if lang:
         language_screen()
     if minigame_bool:
@@ -2837,7 +2880,7 @@ while True:
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:  # Bắt sự kiện lăn xuống
                 scroll_y -= 20  # Điều chỉnh vị trí xuống
         font = pygame.font.Font(None, 24)
-        text_list=read_file2('account/'+str(user)+'/history.txt')
+        text_list = read_file2('account/' + str(user) + '/history.txt')
         scroll_y = max(0, min(scroll_y, len(text_list) * 20 * len(max(text_list, key=len))))
         draw_text_list(screen, text_list, font, scroll_y)
         exit_but.draw_but(screen)

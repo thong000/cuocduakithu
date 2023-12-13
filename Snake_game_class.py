@@ -167,7 +167,7 @@ class Snake_game:
                 self.food_time += 1
                 self.food_time %= 10
 
-                if(self.food_time < 6):
+                if self.food_time < 6:
                     screen.blit(self.food, self.food_rect)
 
                 self.change_direction()
