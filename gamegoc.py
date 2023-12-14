@@ -106,6 +106,8 @@ random_x3 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 random_x4 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 random_x5 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 
+map = 0
+set = 0
 # music
 
 
@@ -1027,7 +1029,7 @@ chooseMapvn_text = Text(game_font1, "Chọn bản đồ", 255, 255, 255)
 set1_text = Text(game_font4, "SET 1", 0, 0, 0)
 
 set2_text = Text(game_font4, "SET 2", 0, 0, 0)
-choosenv = Text(game_font3, "Choose your set of character", 0, 0, 0)
+choosenv = Text(game_font3, "Choose character", 0, 0, 0)
 
 Size1 = Text(game_font1, "100%", 0, 0, 0)
 size1_active = Text(game_font1, "100%", 255, 0, 0)
@@ -1287,18 +1289,24 @@ def wait_screen():
         demo_map1_but.draw_but(screen)
         if pygame.mouse.get_pressed()[0] == 1:
             # Nv11_but.draw_but(screen)
+            click = pygame.mixer.Sound("music/click.mp3")
+            click.play(0)
             off_screen_except(12)
             choose_nv_screen1()
 
     if set2_but.image_rect.collidepoint(pos):
         demo_map2_but.draw_but(screen)
         if pygame.mouse.get_pressed()[0] == 1:
+            click = pygame.mixer.Sound("music/click.mp3")
+            click.play(0)
             off_screen_except(15)
             choose_nv_screen2()
 
     if set3_but.image_rect.collidepoint(pos):
         demo_map3_but.draw_but(screen)
         if pygame.mouse.get_pressed()[0] == 1:
+            click = pygame.mixer.Sound("music/click.mp3")
+            click.play(0)
             off_screen_except(21)
             choose_nv_screen3()
 
@@ -2186,7 +2194,12 @@ def clear_word_file(file_path):
     doc.save(file_path)
 
 
-def ketqua_screen():
+h_y = 200
+head_array = [0, 0, 0, 0, 0]
+
+
+def ketqua_screen(map, set, array_stt):
+    global h_y
     if lan:
         result_screen = pygame.image.load("16.png")
         result_screen_bg = Background(result_screen)
@@ -2202,14 +2215,49 @@ def ketqua_screen():
         time.sleep(0.5)
     exit_but.draw_but(screen)
     if check_press(exit_but.image_rect, pos):
+        global list_stt
+        list_stt = []
         pygame.mixer.music.stop()
         pygame.mixer.music.load("music/nhacnengame.mp3")
         pygame.mixer.music.play(-1)
         off_screen_except(0)
-    global list_nv_win,list_ranking,list_stt
+
+    if map == 1 and set == 1:
+        h1 = Button(head11, 1344 // 2.5, h_y, 80, 80)
+        h2 = Button(head12, 1344 // 2.5, h_y, 80, 80)
+        h3 = Button(head13, 1344 // 2.5, h_y, 80, 80)
+        h4 = Button(head14, 1344 // 2.5, h_y, 80, 80)
+        h5 = Button(head15, 1344 // 2.5, h_y, 80, 80)
+        head_array = [h1, h2, h3, h4, h5]
+        global list_nv_win, list_ranking
+        h_y = 200
+        h1 = Button(head11, 1344 // 2.5, h_y, 80, 80)
+        h2 = Button(head12, 1344 // 2.5, h_y, 80, 80)
+        h3 = Button(head13, 1344 // 2.5, h_y, 80, 80)
+        h4 = Button(head14, 1344 // 2.5, h_y, 80, 80)
+        h5 = Button(head15, 1344 // 2.5, h_y, 80, 80)
+        head_array = [h1, h2, h3, h4, h5]
+        head_array[int(array_stt[0]) - 1].draw_but(screen)
+        h_y = 380
+        h1 = Button(head11, 1344 // 2.5, h_y, 80, 80)
+        h2 = Button(head12, 1344 // 2.5, h_y, 80, 80)
+        h3 = Button(head13, 1344 // 2.5, h_y, 80, 80)
+        h4 = Button(head14, 1344 // 2.5, h_y, 80, 80)
+        h5 = Button(head15, 1344 // 2.5, h_y, 80, 80)
+        head_array = [h1, h2, h3, h4, h5]
+        head_array[int(array_stt[1]) - 1].draw_but(screen)
+        h_y = 580
+        h1 = Button(head11, 1344 // 2.5, h_y, 80, 80)
+        h2 = Button(head12, 1344 // 2.5, h_y, 80, 80)
+        h3 = Button(head13, 1344 // 2.5, h_y, 80, 80)
+        h4 = Button(head14, 1344 // 2.5, h_y, 80, 80)
+        h5 = Button(head15, 1344 // 2.5, h_y, 80, 80)
+        head_array = [h1, h2, h3, h4, h5]
+        head_array[int(array_stt[2]) - 1].draw_but(screen)
+
     list_nv_win = [0, 0, 0, 0, 0]
     list_ranking = []
-    list_stt = []
+    '''list_stt = []'''
 
 
 set1_info = pygame.image.load("nvinfo/info1.png")
@@ -2711,10 +2759,14 @@ while True:
                     list_nv_win[i] = 1
 
             if len(list_stt):
-                if setnv21:
-                    sttnv = 5
                 if setnv11:
+                    sttnv = 5
+                    map = 1
+                    set = 1
+                if setnv21:
                     sttnv = 0
+                    map = 1
+                    set = 2
                 if nv == list_stt[0] and get_coin == False:
                     coin = int((int(coin) - int(bet)) + int(bet) * 4)
                     write_history(str(int(nv + sttnv)), "win", bet, 3 * int(bet))
@@ -2723,14 +2775,7 @@ while True:
                     coin = int((coin - int(bet)))
                     write_history(str(int(nv + sttnv)), "lose", bet, -int(bet))
                     get_coin = True
-                '''if nv2 == list_stt[0] and get_coin == False:
-                    coin = int((int(coin) - int(bet)) + int(bet) * 4)
-                    write_history(str(nv2), "win", bet, 3 * int(bet))
-                    get_coin = True
-                if nv2 != list_stt[0] and get_coin == False:
-                    coin = int((coin - int(bet)))
-                    write_history(str(nv2), "lose", bet, -int(bet))
-                    get_coin = True'''
+                print(list_stt)
 
             if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish:
 
@@ -2742,7 +2787,6 @@ while True:
                 next_but.draw_but(screen)
                 if check_press(next_but.image_rect, pos):
                     off_screen_except(s)
-
 
     if set3:
         map3(pos)
@@ -2837,7 +2881,7 @@ while True:
                 if check_press(next_but.image_rect, pos):
                     off_screen_except(22)
                 exit_but.draw_but(screen)
-                if check_press(exit_but.image_rect,pos):
+                if check_press(exit_but.image_rect, pos):
                     off_screen_except(0)
 
     if lang:
@@ -2872,7 +2916,7 @@ while True:
             off_screen_except(0.5)
 
     if ketqua:
-        ketqua_screen()
+        ketqua_screen(map, set, list_stt)
     if history_bool:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:  # Bắt sự kiện lăn lên
