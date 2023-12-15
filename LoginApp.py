@@ -76,7 +76,8 @@ class LoginApp(App):
                         # History
                         if not os.path.exists("account/" + str(name) + "/history.txt"):
                             with open("account/" + str(name) + "/history.txt", 'w') as file:
-                                file.write("stt,nhan vat,ket qua,tien cuoc,tien nhan duoc,thoi gian")
+                                file.write("Stt,Nhan vat,Ket qua,Tien cuoc,Tien nhan duoc,Thoi gian,Nguon goc")
+                                file.write('/n')
 
                         # Kiem tra dang nhap
                         message = "Login Success!"

@@ -156,7 +156,9 @@ class Store:
                 muado.play()
 
             if check_press(self.close.image_rect, mouse_pos):
-                click_music.play()
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load("music/nhacnengame.mp3")
+                pygame.mixer.music.play(-1)
                 break
 
             for event in pygame.event.get():

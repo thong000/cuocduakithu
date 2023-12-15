@@ -1,5 +1,38 @@
-import pygame, random, sys
+from datetime import datetime
+
+import pygame, random, sys,re
 pygame.init()
+
+
+write_history_active=False
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        text = file.read()
+        numbers = re.findall(r'\d+', text)
+        numeric_values = [int(number) for number in numbers]
+        return numeric_values[0]
+with open('user.txt', 'r') as file:
+    user = file.read()
+def write_history(nv, result, bet, earn,nguon):
+    current_date = datetime.now().date()
+    formatted_date = current_date.strftime("%d/%m/%Y")
+    current_time = datetime.now()
+    hour = current_time.hour
+    minute = current_time.minute
+
+    time = str(hour) + "h" + str(minute) + "p" + "-" + str(formatted_date)
+
+    stt = int(read_file("account/" + str(user) + "/stt.txt"))
+    global write_history_active
+    if write_history_active:
+        with open('account/' + str(user) + '/stt.txt', 'w') as file:
+            file.write(str(int(stt) + 1))
+            write_history_active = False
+    with open('account/' + str(user) + '/history.txt', 'a') as file:
+        file.write(
+            str(int(stt)) + ',' + str(nv) + ',' + str(result) + ',' + str(bet) + ',' + str(earn) + ',' + str(time)+','+str(nguon))
+        file.write('\n')
+
 
 class Snake_game:
     def __init__(self):
@@ -186,7 +219,14 @@ class Snake_game:
 
                 if self.gameover:
                     if self.limit_money > 0:
+                        old_money = money
                         money += min(self.limit_money, self.score)
+                        if money - old_money > 0:
+                            global write_history_active
+                            write_history_active = True
+                            write_history("-", "-", "-", min(self.limit_money, self.score),"Snake Game")
+                        else:
+                            write_history_active = False
                     self.limit_money -= self.score
                     self.score = 0 
                 

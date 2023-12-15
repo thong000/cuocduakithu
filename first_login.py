@@ -76,7 +76,7 @@ while True:
     if check_press(pygame.rect.Rect(0, 0, 1344, 756), pos):
         i += 1
         if i == 6:
-            subprocess.run(["python", "gamegoc.py"])
+            i=0
 
     pygame.display.update()
     clock.tick(60)

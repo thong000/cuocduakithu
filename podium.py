@@ -41,32 +41,32 @@ def check_press(rect, pos):
             return False
 
 
-def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_height):
+def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_height,result):
     """
     đưa vào số thứ tự của thằng đứng thứ 1 -> 5, set nhân vật được chọn 
     (tao hiện tại để 1, 3, 4, 5(set zombie), cái set 2 ảnh tụi mình chả biết ăn mừng kiểu gì =)), surface, kích cỡ window 
     phần dưới đây là khai báo các ảnh vào chương trình
     """
+    if chosen_set!=3:
+        off_screen = 0
+        main_dir = "after_race/podium_resource/set" + str(chosen_set)
+        pos1_dir = main_dir + "/PNG" + str(pos1) + " Sequences/Taunt"
+        pos2_dir = main_dir + "/PNG" + str(pos2) + " Sequences/Taunt"
+        pos3_dir = main_dir + "/PNG" + str(pos3) + " Sequences/Taunt"
+        pos4_dir = main_dir + "/PNG" + str(pos4) + " Sequences/Dying"
+        pos5_dir = main_dir + "/PNG" + str(pos5) + " Sequences/Dying"
 
-    off_screen = 0
-    main_dir = "after_race/podium_resource/set" + str(chosen_set)
-    pos1_dir = main_dir + "/PNG" + str(pos1) + " Sequences/Taunt"
-    pos2_dir = main_dir + "/PNG" + str(pos2) + " Sequences/Taunt"
-    pos3_dir = main_dir + "/PNG" + str(pos3) + " Sequences/Taunt"
-    pos4_dir = main_dir + "/PNG" + str(pos4) + " Sequences/Dying"
-    pos5_dir = main_dir + "/PNG" + str(pos5) + " Sequences/Dying"
+        list1 = os.listdir(pos1_dir)
+        list2 = os.listdir(pos2_dir)
+        list3 = os.listdir(pos3_dir)
+        list4 = os.listdir(pos4_dir)
+        list5 = os.listdir(pos5_dir)
 
-    list1 = os.listdir(pos1_dir)
-    list2 = os.listdir(pos2_dir)
-    list3 = os.listdir(pos3_dir)
-    list4 = os.listdir(pos4_dir)
-    list5 = os.listdir(pos5_dir)
-
-    frame1 = len(list1) - 1
-    frame2 = len(list2) - 1
-    frame3 = len(list3) - 1
-    frame4 = len(list4) - 1
-    frame5 = len(list5) - 1
+        frame1 = len(list1) - 1
+        frame2 = len(list2) - 1
+        frame3 = len(list3) - 1
+        frame4 = len(list4) - 1
+        frame5 = len(list5) - 1
 
     bg = pygame.image.load("after_race/podium_resource/podium.png")
     bg = pygame.transform.scale(bg, (wnd_width, wnd_height))
@@ -74,6 +74,14 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
     exit_but = Button(exit_but_image, 50, 50, 75, 50)
     next_img = pygame.image.load("Button/next.png")
     next_but = Button(next_img, 1200, 720, 100, 50)
+    win = pygame.image.load("end/win.png")
+    win_but = Button(win, 1344 // 2, 756 // 2, 800, 300)
+    lose = pygame.image.load("end/lose.png")
+    thang = pygame.image.load("end/thang.png")
+    thua = pygame.image.load("end/thua.png")
+    lose_but = Button(lose, 1344 // 2, 756 // 2, 800, 300)
+    winvn_but = Button(thang, 1344 // 2, 756 // 2, 800, 300)
+    losevn_but = Button(thua, 1344 // 2, 756 // 2, 800, 300)
 
     k1 = k2 = k3 = k4 = k5 = 0
 
@@ -99,29 +107,48 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
         return cur_frame
 
     off_screen = 0
+
+    start_t=pygame.time.get_ticks()
     while True and off_screen == 0:
-        sur.blit(bg, (0, 0))
-        mouse_pos = pygame.mouse.get_pos()
-        next_but.draw_but(sur)
-        if check_press(next_but.image_rect, mouse_pos):
-            off_screen = 22
+        cur_time=pygame.time.get_ticks()
+        if cur_time-start_t<1000:
+            if result:
+                if lang:
+                    win_but.draw_but(sur)
+                else:
+                    winvn_but.draw_but(sur)
+            else:
+                if lang:
+                    lose_but.draw_but(sur)
+                else:
+                    losevn_but.draw_but(sur)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+        else:
+            if chosen_set!=3:
+                sur.blit(bg, (0, 0))
+                mouse_pos = pygame.mouse.get_pos()
+                next_but.draw_but(sur)
+                if check_press(next_but.image_rect, mouse_pos):
+                    off_screen = 22
 
-                # vẽ từng thằng ra, mỗi thằng có một cái k riêng check frame hiện tại
-        k1 = drawf(k1, frame1, list1, pos1_dir, wnd_width // 36 * 15, wnd_height // 36 * 10, wnd_width // 16 * 3,
-                   wnd_height // 3, True)
-        k2 = drawf(k2, frame2, list2, pos2_dir, wnd_width // 36 * 10, wnd_height // 24 * 7, wnd_width // 16 * 3,
-                   wnd_height // 3, False)
-        k3 = drawf(k3, frame3, list3, pos3_dir, wnd_width // 36 * 20, wnd_height // 24 * 7, wnd_width // 16 * 3,
-                   wnd_height // 3, True)
-        k4 = drawf(k4, frame4, list4, pos4_dir, wnd_width // 5, wnd_height // 3 * 2, wnd_width // 16 * 3,
-                   wnd_height // 3, False)
-        k5 = drawf(k5, frame5, list5, pos5_dir, wnd_width // 36 * 5, wnd_height // 3 * 2, wnd_width // 16 * 3,
-                   wnd_height // 3, False)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                        # vẽ từng thằng ra, mỗi thằng có một cái k riêng check frame hiện tại
+                k1 = drawf(k1, frame1, list1, pos1_dir, wnd_width // 36 * 15, wnd_height // 36 * 10, wnd_width // 16 * 3,
+                           wnd_height // 3, True)
+                k2 = drawf(k2, frame2, list2, pos2_dir, wnd_width // 36 * 10, wnd_height // 24 * 7, wnd_width // 16 * 3,
+                           wnd_height // 3, False)
+                k3 = drawf(k3, frame3, list3, pos3_dir, wnd_width // 36 * 20, wnd_height // 24 * 7, wnd_width // 16 * 3,
+                           wnd_height // 3, True)
+                k4 = drawf(k4, frame4, list4, pos4_dir, wnd_width // 5, wnd_height // 3 * 2, wnd_width // 16 * 3,
+                           wnd_height // 3, False)
+                k5 = drawf(k5, frame5, list5, pos5_dir, wnd_width // 36 * 5, wnd_height // 3 * 2, wnd_width // 16 * 3,
+                           wnd_height // 3, False)
+            else:
+                off_screen=22
 
         pygame.display.update()
     return off_screen
