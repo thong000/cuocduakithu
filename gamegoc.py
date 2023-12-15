@@ -14,6 +14,7 @@ import podium
 import screenshot
 import shutil
 import re
+from pygame.locals import *
 
 pygame.init()
 pygame.mixer.init()
@@ -832,6 +833,14 @@ play = pygame.image.load("Button/play.png")
 play_but = Button(play, 450, 580, 105, 105)
 next_img = pygame.image.load("Button/next.png")
 
+fp=pygame.image.load("Button/fp.png")
+sn=pygame.image.load("Button/sn.png")
+fr=pygame.image.load("Button/fruit.png")
+
+fp_but=Button(fp,200, 400, 300, 300)
+fr_but = Button(fr, 660, 400, 300, 300)
+sn_but = Button(sn, 1100, 400, 300,300)
+
 choose1 = pygame.image.load("Button/set_but1.png")
 choose1vn = pygame.image.load("Button/set_but1vn.png")
 
@@ -881,7 +890,7 @@ box = pygame.image.load("Button/box.png")
 car1 = pygame.image.load("setbg3/set03/car1.png")
 car2 = pygame.image.load("setbg3/set03/car2.png")
 car3 = pygame.image.load("setbg3/set03/car3.png")
-car4 = pygame.image.load("setbg3/set03/car4.png")
+car4 = pygame.image.load("setbg3/set03/car4a.png")
 car5 = pygame.image.load("setbg3/set03/car5.png")
 
 banhxe = pygame.image.load("setbg3/set03/banhxe2.png")
@@ -1266,19 +1275,19 @@ def minigame_screen():
     global screen, coin
     off_screen_except(10)
     background0.draw_bg(screen)
-    fruit_but.draw_but(screen)
-    snake_but.draw_but(screen)
-    flappy_bird_but.draw_but(screen)
+    fr_but.draw_but(screen)
+    sn_but.draw_but(screen)
+    fp_but.draw_but(screen)
 
-    if check_press(flappy_bird_but.image_rect, pos):
+    if check_press(fp_but.image_rect, pos):
         coin = int(PlappyBird.play(coin))
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-    if check_press(snake_but.image_rect, pos):
+    if check_press(sn_but.image_rect, pos):
         coin = int(Snake_game_class.play(coin))
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-    if check_press(fruit_but.image_rect, pos):
+    if check_press(fr_but.image_rect, pos):
         coin = int(Fruit_ninja.play(coin))
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -1390,26 +1399,6 @@ def setting_screen():
         languagevn_but.draw_but(screen)
 
     if check_press(logout_but.image_rect, pos):
-
-        directory_path = "account/" + str(user) + "/"
-
-        # Cấp quyền truy cập cho thư mục
-        try:
-            # Set quyền truy cập cho owner (người sở hữu)
-            os.chmod(directory_path, 0o700)  # Ví dụ: 0o700 là quyền truy cập đầy đủ cho owner
-
-            # Set quyền truy cập cho group (nhóm)
-            # os.chmod(directory_path, 0o770)  # Ví dụ: 0o770 là quyền truy cập đầy đủ cho owner và group
-
-            # Set quyền truy cập cho others (người khác)
-            # os.chmod(directory_path, 0o777)  # Ví dụ: 0o777 là quyền truy cập đầy đủ cho tất cả mọi người
-        except OSError as e:
-            pass
-
-        # Sao chép các hình anh tạm vào file ảnh trong account
-        shutil.copy("temp.docx", "account/" + str(user) + "/screenshot.docx")
-        # Xóa nội dung file tạm
-        clear_word_file("temp.docx")
         with open('log.txt', 'w') as file:
             file.write('0')
         off_screen_except(0)
@@ -2279,9 +2268,7 @@ def ketqua_screen(map, set, array_stt):
         result_screen_bg.draw_bg(screen)
     pygame.image.save(screen, "temp.png")  # Chụp trước khi vẽ nút save
     save_but.draw_but(screen)
-    if check_press(save_but.image_rect, pos):
-        screenshot.save_screenshot("temp.png", "temp.docx")
-        time.sleep(0.5)
+
     exit_but.draw_but(screen)
     if check_press(exit_but.image_rect, pos):
         global list_stt
@@ -2324,6 +2311,7 @@ def ketqua_screen(map, set, array_stt):
         h5 = Button(head15, 1344 // 2.5, h_y, 80, 80)
         head_array = [h1, h2, h3, h4, h5]
         head_array[int(array_stt[2]) - 1].draw_but(screen)
+
     if map == 1 and set == 2:
         h1 = Button(head41, 1344 // 2.5, h_y, 80, 80)
         h2 = Button(head42, 1344 // 2.5, h_y, 80, 80)
@@ -2356,6 +2344,7 @@ def ketqua_screen(map, set, array_stt):
         h5 = Button(head45, 1344 // 2.5, h_y, 80, 80)
         head_array = [h1, h2, h3, h4, h5]
         head_array[int(array_stt[2]) - 1].draw_but(screen)
+
     if map == 2 and set == 1:
         h1 = Button(head31, 1344 // 2.5, h_y, 80, 80)
         h2 = Button(head32, 1344 // 2.5, h_y, 80, 80)
@@ -2388,6 +2377,7 @@ def ketqua_screen(map, set, array_stt):
         h5 = Button(head35, 1344 // 2.5, h_y, 80, 80)
         head_array = [h1, h2, h3, h4, h5]
         head_array[int(array_stt[2]) - 1].draw_but(screen)
+
     if map == 2 and set == 2:
         h1 = Button(head51, 1344 // 2.5, h_y, 80, 80)
         h2 = Button(head52, 1344 // 2.5, h_y, 80, 80)
@@ -2420,6 +2410,7 @@ def ketqua_screen(map, set, array_stt):
         h5 = Button(head55, 1344 // 2.5, h_y, 80, 80)
         head_array = [h1, h2, h3, h4, h5]
         head_array[int(array_stt[2]) - 1].draw_but(screen)
+
     if map == 3:
         h1 = Button(head21, 1344 // 2.5, h_y, 80, 80)
         h2 = Button(head22, 1344 // 2.5, h_y, 80, 80)
@@ -2452,6 +2443,9 @@ def ketqua_screen(map, set, array_stt):
         h5 = Button(head25, 1344 // 2.5, h_y, 80, 80)
         head_array = [h1, h2, h3, h4, h5]
         head_array[int(array_stt[2]) - 1].draw_but(screen)
+    if check_press(save_but.image_rect, pos):
+        screenshot.capture_screen(screen,user)
+        time.sleep(0.5)
 
     list_nv_win = [0, 0, 0, 0, 0]
     list_ranking = []
@@ -2583,7 +2577,31 @@ def first_login_screen(lan, i, screen):
 
 
 scroll_y = 0
+angle=0
+banhxe1=pygame.image.load("setbg3/set03/banhxe1.png")
+banhxe2=pygame.image.load("setbg3/set03/banhxe1.png")
+banhxe3=pygame.image.load("setbg3/set03/banhxe1.png")
+banhxe5=pygame.image.load("setbg3/set03/banhxe1.png")
+def rotate(image_path,x,y,w,h):
+    global angle
+    image = pygame.image.load(image_path)
+    image=pygame.transform.scale(image,(w,h))
+    # Xoay hình ảnh
+    rotated_image = pygame.transform.rotate(image, -angle)
+    rotated_rect = rotated_image.get_rect(center=(x,y))
+
+    # Vẽ hình ảnh đã xoay lên màn hình
+    screen.blit(rotated_image, rotated_rect.topleft)
+
+    angle += 1  # Tăng góc xoay mỗi lần vòng lặp
+    if angle >= 360:
+        angle = 0
+
+
+
+
 while True:
+
     with open('user.txt', 'r') as file:
         user = file.read()
     with open("account/" + str(user) + '/coin.txt', 'r') as file:
@@ -2594,6 +2612,7 @@ while True:
 
     global pos
     pos = pygame.mouse.get_pos()
+    print(pos)
 
     S_nv1 = Text(game_font2, str(int(w11_x / 5)), 0, 0, 0)
     S_nv2 = Text(game_font2, str(int(w12_x / 5)), 0, 0, 0, )
@@ -2706,7 +2725,7 @@ while True:
                 start_butvn.draw_but(screen)
             pygame.mixer.music.stop()
             pygame.mixer.music.load("music/lucvodua2.mp3")
-            pygame.mixer.music.play(0)
+            pygame.mixer.music.play(-1)
             w11_x = w12_x = w13_x = w14_x = w15_x = 10
         else:
 
@@ -3030,15 +3049,23 @@ while True:
             w11_x = w12_x = w13_x = w14_x = w15_x = 1
         else:
 
+
+
             car1_obj = nhanVat("car1_obj", car1, w11_x, 225, 140, 90)
             car1_obj.draw_nv(1)
+            rotate("setbg3/set03/banhxe1.png", w11_x - 33, 243, 49, 49)
+            rotate("setbg3/set03/banhxe1.png", w11_x + 32, 243, 49, 49)
             if car1_obj.check_vc(box_but1) and box_touch[1] == 0: w11_x, x1 = lucky_atr(w11_x, x1, lucky1, car1_obj, 1)
             if k_stun[1]: w11_x, k_stun[1] = stun_effect(w11_x, x1, k_stun[1], 225)
             if rever[1]: w11_x -= 2 * x1
             if tele[1]: tele[1] = tele_effect(tele[1], tele_x[1], lucky1 * 3, 225)
 
+
+
             car2_obj = nhanVat("car2_obj", car2, w12_x, 325, 160, 90)
             car2_obj.draw_nv(2)
+            rotate("setbg3/set03/banhxe1.png", w12_x - 23, 350, 25, 25)
+            rotate("setbg3/set03/banhxe1.png", w12_x + 12, 350, 25, 25)
             if car2_obj.check_vc(box_but2) and box_touch[2] == 0: w12_x, x2 = lucky_atr(w12_x, x2, lucky2, car2_obj, 2)
             if k_stun[2]: w12_x, k_stun[2] = stun_effect(w12_x, x2, k_stun[2], 325)
             if rever[2]: w12_x -= 2 * x2
@@ -3046,13 +3073,18 @@ while True:
 
             car3_obj = nhanVat("car3_obj", car3, w13_x, 450, 160, 90)
             car3_obj.draw_nv(3)
+            rotate("setbg3/set03/banhxe1.png", w13_x - 23, 470, 40, 40)
+            rotate("setbg3/set03/banhxe1.png", w13_x + 20, 470, 40, 40)
             if car3_obj.check_vc(box_but3) and box_touch[3] == 0: w13_x, x3 = lucky_atr(w13_x, x3, lucky3, car3_obj, 3)
             if k_stun[3]: w13_x, k_stun[3] = stun_effect(w13_x, x3, k_stun[3], 450)
             if rever[3]: w13_x -= 2 * x3
             if tele[3]: tele[3] = tele_effect(tele[3], tele_x[3], lucky3 * 3, 450)
 
-            car4_obj = nhanVat("car4_obj", car4, w14_x, 550, 160, 90)
+            rotate("setbg3/set03/banhxe2.png", w14_x - 20, 571, 30, 30)
+            rotate("setbg3/set03/banhxe2.png", w14_x + 20, 571, 30, 30)
+            car4_obj = nhanVat("car4_obj", car4, w14_x, 550, 170, 100)
             car4_obj.draw_nv(4)
+
             if car4_obj.check_vc(box_but4) and box_touch[4] == 0: w14_x, x4 = lucky_atr(w14_x, x4, lucky4, car4_obj, 4)
             if k_stun[4]: w14_x, k_stun[4] = stun_effect(w14_x, x4, k_stun[4], 550)
             if rever[4]: w14_x -= 2 * x4
@@ -3060,6 +3092,9 @@ while True:
 
             car5_obj = nhanVat("car5_obj", car5, w15_x, 675, 160, 90)
             car5_obj.draw_nv(5)
+            rotate("setbg3/set03/banhxe1.png", w15_x - 42, 703, 40, 40)
+            rotate("setbg3/set03/banhxe1.png", w15_x + 13, 703, 40, 40)
+            rotate("setbg3/set03/banhxe1.png", w15_x + 60, 703, 40, 40)
             if car5_obj.check_vc(box_but5) and box_touch[5] == 0: w15_x, x5 = lucky_atr(w15_x, x5, lucky5, car5_obj, 5)
             if k_stun[5]: w15_x, k_stun[5] = stun_effect(w15_x, x5, k_stun[5], 650)
             if rever[5]: w15_x -= 2 * x5
