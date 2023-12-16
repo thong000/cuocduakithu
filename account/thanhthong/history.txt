@@ -34,3 +34,8 @@ Stt,Nhan vat,Ket qua,Tien cuoc,Tien nhan duoc,Thoi gian,Nguon goc
 33,6,lose,2,-2,20h41p-16/12/2023,Main game
 34,6,lose,2,-2,20h41p-16/12/2023,Main game
 35,6,lose,2,-2,20h42p-16/12/2023,Main game
+36,-,-,-,3,21h28p-16/12/2023,Flappy Bird
+37,-,-,-,3,21h28p-16/12/2023,Flappy Bird
+38,-,-,-,1,21h28p-16/12/2023,Flappy Bird
+39,-,-,-,2,21h29p-16/12/2023,Flappy Bird
+40,-,-,-,1,21h29p-16/12/2023,Flappy Bird

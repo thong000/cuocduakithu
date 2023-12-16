@@ -8,26 +8,38 @@ from kivy.uix.popup import Popup
 import smtplib
 import os
 
-
 import yaml  # pip install pyyaml
+
+with open('lan.txt', 'r') as file:
+    l = file.read()
+    if l == "1":
+        lan = True
+    if l == "0":
+        lan = False
 
 
 class LoginApp(App):
 
     # tạo dao diện đăng nhập
     def build(self):
+        if lan:
+            self.title = "Login form"
+            head_label = Label(text="User login", font_size=26, bold=True, height=40)
+            name_label = Label(text="Name:", font_size=18)
+            password_label = Label(text="Password:", font_size=18)
+            login_button = Button(text="Login", font_size=18, on_press=self.login)
+        else:
+            self.title = "Biểu mẫu đăng nhập"
+            head_label = Label(text="Đăng nhập", font_size=26, bold=True, height=40)
+            name_label = Label(text="Tên:", font_size=18)
+            password_label = Label(text="Mật khẩu:", font_size=18)
+            login_button = Button(text="Đăng nhập", font_size=18, on_press=self.login)
 
-        self.title = "Login form"
         layout = BoxLayout(orientation="vertical", padding=30, spacing=10, size=(800, 400))
 
-        head_label = Label(text="User login", font_size=26, bold=True, height=40)
-
-        name_label = Label(text="Name:", font_size=18)
         self.name_input = TextInput(multiline=False, font_size=18)
-        password_label = Label(text="Password:", font_size=18)
-        self.password_input = TextInput(multiline=False, font_size=18, password=True)
 
-        login_button = Button(text="Login", font_size=18, on_press=self.login)
+        self.password_input = TextInput(multiline=False, font_size=18, password=True)
 
         layout.add_widget(head_label)
         layout.add_widget(name_label)
@@ -36,7 +48,10 @@ class LoginApp(App):
         layout.add_widget(self.password_input)
         layout.add_widget(login_button)
 
-        popup = Popup(title="User Login", content=layout, size_hint=(None, None), size=(800, 400))
+        if lan:
+            popup = Popup(title="User Login", content=layout, size_hint=(None, None), size=(800, 400))
+        else:
+            popup = Popup(title="Đăng nhập", content=layout, size_hint=(None, None), size=(800, 400))
         popup.open()
 
     # phương thức login khi login_button được kích hoạt
@@ -47,14 +62,23 @@ class LoginApp(App):
         password = self.password_input.text
         filename = "account/" + str(name) + '/info.txt'
 
+
+        if lan:
+            a="please fill in all fields"
+            b="Wrong password!"
+            c="Login Success!"
+        else:
+            a = "vui lòng nhập đầy đủ"
+            b="Sai mật khẩu"
+            c="Đăng nhập thành công!"
         if name.strip() == '' or password.strip() == '':
-            message = "please fill in all fields"
+            message = str(a)
         else:
             if os.path.exists(filename):
                 with open(filename, 'r') as file:
                     data = yaml.safe_load(file)
                     if str(password) != str(data['Password']):
-                        message = "Wrong password!"
+                        message = str(b)
                         with open('log.txt', 'w') as file:
                             file.write(str(0))
                     else:
@@ -80,7 +104,7 @@ class LoginApp(App):
                                 file.write('/n')
 
                         # Kiem tra dang nhap
-                        message = "Login Success!"
+                        message = str(c)
                         self.lock = True
 
                         # Lưu tình trạng đăng nhập
@@ -91,7 +115,7 @@ class LoginApp(App):
                         with open('user.txt', 'w') as file:
                             file.write(name)
 
-                        #Stt của lịch sử
+                        # Stt của lịch sử
                         if not os.path.exists("account/" + str(name) + "/stt.txt"):
                             with open("account/" + str(name) + "/stt.txt", 'w') as file:
                                 file.write("1")
@@ -108,7 +132,10 @@ class LoginApp(App):
 
 
             else:
-                message = "User name doesn't exit"
+                if lan:
+                    message = "User name doesn't exit"
+                else:
+                    message = "Tài khoản không tồn tại"
 
         popup_final = Popup(title="Login Status", content=Label(text=message), size_hint=(None, None), size=(400, 200))
         popup_final.open()
