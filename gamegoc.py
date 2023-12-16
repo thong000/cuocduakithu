@@ -113,7 +113,8 @@ random_x5 = random.randrange(SCREEN_WIDTH // 3, SCREEN_WIDTH // 2)
 map = 0
 set = 0
 start_t = 0
-# music
+
+log1st=False
 
 
 channel = pygame.mixer.Channel(0)
@@ -1236,8 +1237,7 @@ def menu_screen():
             minigame_screen()
         if check_press(rule_but.image_rect, pos):
             off_screen_except(11)
-        '''store = store_func
-        store.Store(lan, 1344 // 2, 768 // 2)'''
+
         coin_text = Text(game_font1, str(coin), 255, 200, 60)
         coin_text.draw_text(screen, 1140, -6)
         coin_but.draw_but(screen)
@@ -1471,21 +1471,23 @@ def choose_nv_screen1():
     global info
     if not s1_active:
         global finish
-        finish = 1250
+        global background1
         Size1.draw_text(screen, 200, 600)
     else:
-        finish = 1180
+        background1 = background1
+        finish = 1120
         size1_active.draw_text(screen, 200, 600)
     if not s2_active:
-        finish = 1100
         Size2.draw_text(screen, 100, 600)
-        global background1
-        background1 = background1_lv2
+
     else:
+        background1 = background1_lv2
+        finish = 1100
         size2_active.draw_text(screen, 100, 600)
     if not s3_active:
         Size3.draw_text(screen, 0, 600)
     else:
+        finish = 1072
         background1 = background1_lv3
         size3_active.draw_text(screen, 0, 600)
 
@@ -2268,12 +2270,43 @@ def clear_word_file(file_path):
     # Lưu lại tệp Word đã xóa sạch
     doc.save(file_path)
 
+onevn = pygame.image.load("NPC/Vie/20.png")
+twovn = pygame.image.load("NPC/Vie/21.png")
+threevn = pygame.image.load("NPC/Vie/23.png")
+fourvn = pygame.image.load("NPC/Vie/25.png")
+fivevn = pygame.image.load("NPC/Vie/27.png")
+sixvn = pygame.image.load("NPC/Vie/29.png")
+A = [onevn, twovn, threevn, fourvn, fivevn,sixvn]
+for i in range(0, 6, 1):
+    A[i] = Background(A[i])
+
+one = pygame.image.load("NPC/Eng/19.png")
+two = pygame.image.load("NPC/Eng/22.png")
+three = pygame.image.load("NPC/Eng/24.png")
+four = pygame.image.load("NPC/Eng/26.png")
+five = pygame.image.load("NPC/Eng/28.png")
+six = pygame.image.load("NPC/Eng/30.png")
+B = [one, two, three, four, five,six]
+for j in range(0, 6, 1):
+    B[j] = Background(B[j])
+
+
+def first_login_screen(lan, i, screen):
+    if lan:
+        B[i].draw_bg(screen)
+    else:
+        A[i].draw_bg(screen)
+
+
+
+
 
 h_y = 200
 head_array = [0, 0, 0, 0, 0]
 
 
 def ketqua_screen(map, set, array_stt):
+
     global h_y
     if lan:
         result_screen = pygame.image.load("16.png")
@@ -2689,27 +2722,41 @@ while True:
                 scroll_y -= 20
 
     if set_:
-        menu_screen()
-        music = 0
+        with open('first_log.txt','r') as file:
+            if file.read()=="1":
+                log1st=True
+        if not log1st:
+            menu_screen()
+            music = 0
+            store = store_func
+            shop = store.Store(lan, 1344 , 756)
+            store_img = pygame.image.load("extra_stuff/store/store.png")
+            store = Button(store_img, 1200, 650, 200, 200)
+            if lock:
+                store.draw_but(screen)
+            if check_press(store.image_rect, pos) and lock:
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load("music/nhac nen mua do.mp3")
+                pygame.mixer.music.play(-1)
+                if game_finish == 1:
+                    shop.buy1 = True
+                    shop.buy2 = True
+                    shop.buy3 = True
+                    game_finish = 0
+                buff, coin = shop.running(screen, coin, 1344, 768)
+                coin_but.draw_but(screen)
 
-        store_img = pygame.image.load("extra_stuff/store/store.png")
-        store = Button(store_img, 1200, 650, 200, 200)
-        if lock:
-            store.draw_but(screen)
-        if check_press(store.image_rect, pos) and lock:
-            pygame.mixer.music.stop()
-            pygame.mixer.music.load("music/nhac nen mua do.mp3")
-            pygame.mixer.music.play(-1)
-            if game_finish == 1:
-                shop.buy1 = True
-                shop.buy2 = True
-                shop.buy3 = True
-                game_finish = 0
-            buff, coin = shop.running(screen, coin, 1344, 768)
-            coin_but.draw_but(screen)
+                coin_text = Text(game_font1, str(coin), 255, 200, 60)
+                coin_text.draw_text(screen, 1130, -6)
+        else:
+            first_login_screen(not lan, i, screen)
+            if check_press(pygame.rect.Rect(0, 0, 1344, 756), pos):
+                i += 1
+                if i == 5:
+                    with open('first_log.txt','w') as file:
+                        file.write("0")
 
-            coin_text = Text(game_font1, str(coin), 255, 200, 60)
-            coin_text.draw_text(screen, 1130, -6)
+
 
     if wait:
         wait_screen()

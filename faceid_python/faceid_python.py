@@ -13,7 +13,7 @@ pygame.init()
 
 screen = pygame.display.set_mode((1344, 756))
 a=False
-b="t"
+b=""
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

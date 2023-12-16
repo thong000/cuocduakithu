@@ -2,6 +2,7 @@
 import os
 import sys
 
+pygame.mixer.init()
 with open('lan.txt', 'r') as language:
     l = language.read()
     if l == "1":
@@ -41,13 +42,13 @@ def check_press(rect, pos):
             return False
 
 
-def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_height,result):
+def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_height, result):
     """
     đưa vào số thứ tự của thằng đứng thứ 1 -> 5, set nhân vật được chọn 
     (tao hiện tại để 1, 3, 4, 5(set zombie), cái set 2 ảnh tụi mình chả biết ăn mừng kiểu gì =)), surface, kích cỡ window 
     phần dưới đây là khai báo các ảnh vào chương trình
     """
-    if chosen_set!=3:
+    if chosen_set != 3:
         off_screen = 0
         main_dir = "after_race/podium_resource/set" + str(chosen_set)
         pos1_dir = main_dir + "/PNG" + str(pos1) + " Sequences/Taunt"
@@ -108,10 +109,10 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
 
     off_screen = 0
 
-    start_t=pygame.time.get_ticks()
+    start_t = pygame.time.get_ticks()
     while True and off_screen == 0:
-        cur_time=pygame.time.get_ticks()
-        if cur_time-start_t<1000:
+        cur_time = pygame.time.get_ticks()
+        if cur_time - start_t < 1000:
             if result:
                 if lang:
                     win_but.draw_but(sur)
@@ -124,7 +125,8 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
                     losevn_but.draw_but(sur)
 
         else:
-            if chosen_set!=3:
+
+            if chosen_set != 3:
                 sur.blit(bg, (0, 0))
                 mouse_pos = pygame.mouse.get_pos()
                 next_but.draw_but(sur)
@@ -137,7 +139,8 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
                         sys.exit()
 
                         # vẽ từng thằng ra, mỗi thằng có một cái k riêng check frame hiện tại
-                k1 = drawf(k1, frame1, list1, pos1_dir, wnd_width // 36 * 15, wnd_height // 36 * 10, wnd_width // 16 * 3,
+                k1 = drawf(k1, frame1, list1, pos1_dir, wnd_width // 36 * 15, wnd_height // 36 * 10,
+                           wnd_width // 16 * 3,
                            wnd_height // 3, True)
                 k2 = drawf(k2, frame2, list2, pos2_dir, wnd_width // 36 * 10, wnd_height // 24 * 7, wnd_width // 16 * 3,
                            wnd_height // 3, False)
@@ -148,7 +151,7 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
                 k5 = drawf(k5, frame5, list5, pos5_dir, wnd_width // 36 * 5, wnd_height // 3 * 2, wnd_width // 16 * 3,
                            wnd_height // 3, False)
             else:
-                off_screen=22
+                off_screen = 22
 
         pygame.display.update()
     return off_screen

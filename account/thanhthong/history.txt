@@ -24,3 +24,13 @@ Stt,Nhan vat,Ket qua,Tien cuoc,Tien nhan duoc,Thoi gian,Nguon goc
 23,21,win,3,9,0h16p-16/12/2023,Main game
 24,21,win,3,9,0h26p-16/12/2023,Main game
 25,6,lose,3,-3,0h29p-16/12/2023,Main game
+26,6,lose,2,-2,20h10p-16/12/2023,Main game
+27,6,lose,1,-1,20h11p-16/12/2023,Main game
+28,6,lose,1,-1,20h13p-16/12/2023,Main game
+29,6,win,5,15,20h15p-16/12/2023,Main game
+30,6,lose,1,-1,20h17p-16/12/2023,Main game
+31,6,lose,1,-1,20h34p-16/12/2023,Main game
+32,6,win,1,3,20h39p-16/12/2023,Main game
+33,6,lose,2,-2,20h41p-16/12/2023,Main game
+34,6,lose,2,-2,20h41p-16/12/2023,Main game
+35,6,lose,2,-2,20h42p-16/12/2023,Main game
