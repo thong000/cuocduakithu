@@ -14,7 +14,10 @@ import podium
 import screenshot
 import shutil
 import re
+import faceid_python
 from pygame.locals import *
+
+from faceid_python import function_faceid
 
 pygame.init()
 pygame.mixer.init()
@@ -187,7 +190,7 @@ from datetime import datetime
 
 
 # Các class
-def write_history(nv, result, bet, earn,nguon):
+def write_history(nv, result, bet, earn, nguon):
     current_date = datetime.now().date()
     formatted_date = current_date.strftime("%d/%m/%Y")
     current_time = datetime.now()
@@ -204,7 +207,8 @@ def write_history(nv, result, bet, earn,nguon):
             write_history_active = False
     with open('account/' + str(user) + '/history.txt', 'a') as file:
         file.write(
-            str(int(stt)) + ',' + str(nv) + ',' + str(result) + ',' + str(bet) + ',' + str(earn) + ',' + str(time)+','+str(nguon))
+            str(int(stt)) + ',' + str(nv) + ',' + str(result) + ',' + str(bet) + ',' + str(earn) + ',' + str(
+                time) + ',' + str(nguon))
         file.write('\n')
 
 
@@ -833,13 +837,13 @@ play = pygame.image.load("Button/play.png")
 play_but = Button(play, 450, 580, 105, 105)
 next_img = pygame.image.load("Button/next.png")
 
-fp=pygame.image.load("Button/fp.png")
-sn=pygame.image.load("Button/sn.png")
-fr=pygame.image.load("Button/fruit.png")
+fp = pygame.image.load("Button/fp.png")
+sn = pygame.image.load("Button/sn.png")
+fr = pygame.image.load("Button/fruit.png")
 
-fp_but=Button(fp,200, 400, 300, 300)
+fp_but = Button(fp, 200, 400, 300, 300)
 fr_but = Button(fr, 660, 400, 300, 300)
-sn_but = Button(sn, 1100, 400, 300,300)
+sn_but = Button(sn, 1100, 400, 300, 300)
 
 choose1 = pygame.image.load("Button/set_but1.png")
 choose1vn = pygame.image.load("Button/set_but1vn.png")
@@ -1161,6 +1165,10 @@ def language_screen():
         time.sleep(0.1)
 
 
+face_id_img = pygame.image.load("Button/face_id.png")
+face_id_but = Button(face_id_img, SCREEN_WIDTH // 1.95, SCREEN_HEIGHT // 1.3, 250, 130)
+
+
 def account_login():
     if lock:
         background.draw_bg(screen)
@@ -1235,6 +1243,7 @@ def menu_screen():
         coin_but.draw_but(screen)
     else:
         background.draw_bg(screen)
+        face_id_but.draw_but(screen)
         Vie_text = Text(game_font1, "VIE", abs(255 - r), abs(255 - g), abs(255 - b))
         Eng_text = Text(game_font1, "ENG", r, g, b)
         Vie_text.draw_text(screen, 100, 710)
@@ -1249,6 +1258,14 @@ def menu_screen():
                 r = g = b = 255
                 with open('lan.txt', 'w') as file:
                     file.write("1")
+        if check_press(face_id_but.image_rect, pos):
+            log, account = function_faceid.FaceID(1, 1344, 756, screen)
+            if log:
+                with open('log.txt', 'w') as file:
+                    file.write(str(1))
+            with open('user.txt', 'w') as file:
+                file.write(str(account))
+
         if lan:
             signup_but.draw_but(screen)
             login_but.draw_but(screen)
@@ -2444,7 +2461,7 @@ def ketqua_screen(map, set, array_stt):
         head_array = [h1, h2, h3, h4, h5]
         head_array[int(array_stt[2]) - 1].draw_but(screen)
     if check_press(save_but.image_rect, pos):
-        screenshot.capture_screen(screen,user)
+        screenshot.capture_screen(screen, user)
         time.sleep(0.5)
 
     list_nv_win = [0, 0, 0, 0, 0]
@@ -2577,18 +2594,20 @@ def first_login_screen(lan, i, screen):
 
 
 scroll_y = 0
-angle=0
-banhxe1=pygame.image.load("setbg3/set03/banhxe1.png")
-banhxe2=pygame.image.load("setbg3/set03/banhxe1.png")
-banhxe3=pygame.image.load("setbg3/set03/banhxe1.png")
-banhxe5=pygame.image.load("setbg3/set03/banhxe1.png")
-def rotate(image_path,x,y,w,h):
+angle = 0
+banhxe1 = pygame.image.load("setbg3/set03/banhxe1.png")
+banhxe2 = pygame.image.load("setbg3/set03/banhxe1.png")
+banhxe3 = pygame.image.load("setbg3/set03/banhxe1.png")
+banhxe5 = pygame.image.load("setbg3/set03/banhxe1.png")
+
+
+def rotate(image_path, x, y, w, h):
     global angle
     image = pygame.image.load(image_path)
-    image=pygame.transform.scale(image,(w,h))
+    image = pygame.transform.scale(image, (w, h))
     # Xoay hình ảnh
     rotated_image = pygame.transform.rotate(image, -angle)
-    rotated_rect = rotated_image.get_rect(center=(x,y))
+    rotated_rect = rotated_image.get_rect(center=(x, y))
 
     # Vẽ hình ảnh đã xoay lên màn hình
     screen.blit(rotated_image, rotated_rect.topleft)
@@ -2596,8 +2615,6 @@ def rotate(image_path,x,y,w,h):
     angle += 1  # Tăng góc xoay mỗi lần vòng lặp
     if angle >= 360:
         angle = 0
-
-
 
 
 while True:
@@ -2838,12 +2855,12 @@ while True:
                     set = 2
                 if nv2 == list_stt[0] and get_coin == False:
                     coin = int((int(coin) - int(bet)) + int(bet) * 4)
-                    write_history(str(nv2 + sttnv), "win", bet, 3 * int(bet),"Main game")
+                    write_history(str(nv2 + sttnv), "win", bet, 3 * int(bet), "Main game")
                     win_or_lose = True
                     get_coin = True
                 if nv2 != list_stt[0] and get_coin == False:
                     coin = int((coin - int(bet)))
-                    write_history(str(nv2 + sttnv), "lose", bet, -int(bet),"Main game")
+                    write_history(str(nv2 + sttnv), "lose", bet, -int(bet), "Main game")
                     get_coin = True
                     win_or_lose = False
 
@@ -2996,12 +3013,12 @@ while True:
                     set = 2
                 if nv == list_stt[0] and get_coin == False:
                     coin = int((int(coin) - int(bet)) + int(bet) * 4)
-                    write_history(str(int(nv + sttnv)), "win", bet, 3 * int(bet),"Main game")
+                    write_history(str(int(nv + sttnv)), "win", bet, 3 * int(bet), "Main game")
                     get_coin = True
                     win_or_lose = True
                 if nv != list_stt[0] and get_coin == False:
                     coin = int((coin - int(bet)))
-                    write_history(str(int(nv + sttnv)), "lose", bet, -int(bet),"Main game")
+                    write_history(str(int(nv + sttnv)), "lose", bet, -int(bet), "Main game")
                     get_coin = True
                     win_or_lose = False
 
@@ -3049,8 +3066,6 @@ while True:
             w11_x = w12_x = w13_x = w14_x = w15_x = 1
         else:
 
-
-
             car1_obj = nhanVat("car1_obj", car1, w11_x, 225, 140, 90)
             car1_obj.draw_nv(1)
             rotate("setbg3/set03/banhxe1.png", w11_x - 33, 243, 49, 49)
@@ -3059,8 +3074,6 @@ while True:
             if k_stun[1]: w11_x, k_stun[1] = stun_effect(w11_x, x1, k_stun[1], 225)
             if rever[1]: w11_x -= 2 * x1
             if tele[1]: tele[1] = tele_effect(tele[1], tele_x[1], lucky1 * 3, 225)
-
-
 
             car2_obj = nhanVat("car2_obj", car2, w12_x, 325, 160, 90)
             car2_obj.draw_nv(2)
@@ -3111,13 +3124,13 @@ while True:
             if len(list_stt):
                 if nv3 == list_stt[0] and get_coin == False:
                     coin = int((int(coin) - int(bet)) + int(bet) * 4)
-                    write_history(str(int(nv3 + 20)), "win", bet, 3 * int(bet),"Main game")
+                    write_history(str(int(nv3 + 20)), "win", bet, 3 * int(bet), "Main game")
                     get_coin = True
                     map = 3
                     win_or_lose = True
                 if nv3 != list_stt[0] and get_coin == False:
                     coin = int((coin - int(bet)))
-                    write_history(str(int(nv3 + 20)), "lose", bet, -int(bet),"Main game")
+                    write_history(str(int(nv3 + 20)), "lose", bet, -int(bet), "Main game")
                     get_coin = True
                     map = 3
                     win_or_lose = False
