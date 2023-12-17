@@ -208,7 +208,7 @@ class Snake_game:
                 self.change_pos()
 
                 self.body_list.insert(0,self.body.get_rect(topleft = (self.body_pos_x, self.body_pos_y)))
-                if(self.score != len(self.body_list) - 1):
+                if self.score != len(self.body_list) - 1:
                     self.body_list.pop()
 
                 self.draw_body(screen)

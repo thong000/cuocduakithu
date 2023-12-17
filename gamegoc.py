@@ -21,6 +21,7 @@ from faceid_python import function_faceid
 
 pygame.init()
 pygame.mixer.init()
+
 write_history_active = True
 with open('user.txt', 'r') as file:
     user = file.read()
@@ -78,7 +79,7 @@ def draw_text_list(screen, text_list, font, scroll_y):
                 y_position = i * 20 + k * 20 - scroll_y  # Vị trí của mỗi dòng con trong cột, điều chỉnh theo lăn chuột
                 screen.blit(text_surface, (x_position, y_position))
 
-    pygame.display.flip()
+    '''pygame.display.flip()'''
 
 
 # Thông số cơ bản
@@ -114,8 +115,7 @@ map = 0
 set = 0
 start_t = 0
 
-log1st=False
-
+log1st = False
 
 channel = pygame.mixer.Channel(0)
 # biến ngôn ngữ
@@ -928,7 +928,7 @@ rule_but = Button(rule, 480, 712, 100, 55)
 rulevn_but = Button(rulevn, 480, 718, 120, 60)
 
 coin_img = pygame.image.load("Button/coin.png")
-coin_but = Button(coin_img, 1230, 18, 50, 50)
+coin_but = Button(coin_img, 80, 60, 50, 50)
 
 demo_map1_but = Button(bg1, demomap_x, demomap_y, demomap_w, demomap_h)
 demo_map2_but = Button(bg2, demomap_x, demomap_y, demomap_w, demomap_h)
@@ -1197,6 +1197,10 @@ r = g = b = 255
 
 
 def menu_screen():
+    global background1, background2, background3
+    background1 = Background(bg1)
+    background2 = Background(bg2)
+    background3 = Background(bg3)
     win_but.draw_but(screen)
     global r, g, b
     global get_coin  # check xem co cong coin khi thang chua
@@ -1239,8 +1243,10 @@ def menu_screen():
             off_screen_except(11)
 
         coin_text = Text(game_font1, str(coin), 255, 200, 60)
-        coin_text.draw_text(screen, 1140, -6)
+        coin_text.draw_text(screen, 10, 35)
         coin_but.draw_but(screen)
+        user_text = Text(game_font1, str(user), 255, 200, 60)
+        user_text.draw_text(screen, 10, 2)
     else:
         background.draw_bg(screen)
         face_id_but.draw_but(screen)
@@ -1314,6 +1320,8 @@ def minigame_screen():
 
 
 def wait_screen():
+    global bet
+    bet = ""
     background0.draw_bg(screen)
 
     if lan:
@@ -1614,7 +1622,7 @@ def choose_nv_screen1():
                 background0.draw_bg(screen)
                 nv_info(4, lan)
 
-    pygame.display.flip()
+    '''pygame.display.flip()'''
     exit_but.draw_but(screen)
     if check_press(exit_but.image_rect, pos):
         off_screen_except(0.5)
@@ -1633,7 +1641,7 @@ def choose_nv_screen1():
             s3_active = True
             s1_active = False
             s2_active = False
-    pygame.display.update()
+    '''pygame.display.update()'''
 
     next_but = Button(next_img, 1200, 720, 100, 50)
     if bet != "" and int(bet) <= int(coin) and nv != "" and 1 <= int(nv) <= 5:
@@ -1700,22 +1708,24 @@ def choose_nv_screen2():
 
     if not s1_active:
         global finish
-        finish = 1250
+        global background1
         Size1.draw_text(screen, 200, 600)
     else:
-        finish = 1180
+        background1 = background1
+        finish = 1120
         size1_active.draw_text(screen, 200, 600)
     if not s2_active:
-        finish = 1100
         Size2.draw_text(screen, 100, 600)
-        global background2
-        background2 = background2_lv2
+
     else:
+        background1 = background1_lv2
+        finish = 1100
         size2_active.draw_text(screen, 100, 600)
     if not s3_active:
         Size3.draw_text(screen, 0, 600)
     else:
-        background2 = background2_lv3
+        finish = 1072
+        background1 = background1_lv3
         size3_active.draw_text(screen, 0, 600)
 
     for event in pygame.event.get():
@@ -1859,7 +1869,7 @@ def choose_nv_screen2():
             s3_active = True
             s1_active = False
             s2_active = False
-    pygame.display.update()
+    '''pygame.display.update()'''
     next_img = pygame.image.load("Button/next.png")
     next_but = Button(next_img, 1200, 720, 100, 50)
     if bet != "" and int(bet) <= coin and nv2 != "" and 1 <= int(nv2) <= 5:
@@ -1917,10 +1927,10 @@ def choose_nv_screen3():
     if check_press(Nv35_but.image_rect, pos):
         nv3 = 5
     if lan:
-        nv1_choosed = Text(game_font1, "Character: " + str(nv), 0, 0, 0)
+        nv1_choosed = Text(game_font1, "Character: " + str(nv3), 0, 0, 0)
         nv1_choosed.draw_text(screen, 500, 500)
     else:
-        nv1_choosed = Text(game_font1, "Nhân vật: " + str(nv), 0, 0, 0)
+        nv1_choosed = Text(game_font1, "Nhân vật: " + str(nv3), 0, 0, 0)
         nv1_choosed.draw_text(screen, 500, 500)
     if pygame.rect.Rect(200, 600, 100, 40).collidepoint(pos):
         if pygame.mouse.get_pressed()[0] == 1:
@@ -1940,22 +1950,24 @@ def choose_nv_screen3():
 
     if not s1_active:
         global finish
-        finish = 1250
+        global background1
         Size1.draw_text(screen, 200, 600)
     else:
-        finish = 1180
+        background1 = background1
+        finish = 1120
         size1_active.draw_text(screen, 200, 600)
     if not s2_active:
-        finish = 1100
         Size2.draw_text(screen, 100, 600)
-        global background3
-        background3 = background3_lv3
+
     else:
+        background1 = background1_lv2
+        finish = 1100
         size2_active.draw_text(screen, 100, 600)
     if not s3_active:
         Size3.draw_text(screen, 0, 600)
     else:
-        background3 = background3_lv3
+        finish = 1072
+        background1 = background1_lv3
         size3_active.draw_text(screen, 0, 600)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -1975,7 +1987,7 @@ def choose_nv_screen3():
     if check_press(exit_but.image_rect, pos):
         off_screen_except(0.5)
 
-    pygame.display.update()
+    '''pygame.display.update()'''
     next_img = pygame.image.load("Button/next.png")
     next_but = Button(next_img, 1200, 720, 100, 50)
     if bet != "" and int(bet) <= coin and nv3 != "" and 1 <= int(nv3) <= 5:
@@ -2270,13 +2282,14 @@ def clear_word_file(file_path):
     # Lưu lại tệp Word đã xóa sạch
     doc.save(file_path)
 
+
 onevn = pygame.image.load("NPC/Vie/20.png")
 twovn = pygame.image.load("NPC/Vie/21.png")
 threevn = pygame.image.load("NPC/Vie/23.png")
 fourvn = pygame.image.load("NPC/Vie/25.png")
 fivevn = pygame.image.load("NPC/Vie/27.png")
 sixvn = pygame.image.load("NPC/Vie/29.png")
-A = [onevn, twovn, threevn, fourvn, fivevn,sixvn]
+A = [onevn, twovn, threevn, fourvn, fivevn, sixvn]
 for i in range(0, 6, 1):
     A[i] = Background(A[i])
 
@@ -2286,7 +2299,7 @@ three = pygame.image.load("NPC/Eng/24.png")
 four = pygame.image.load("NPC/Eng/26.png")
 five = pygame.image.load("NPC/Eng/28.png")
 six = pygame.image.load("NPC/Eng/30.png")
-B = [one, two, three, four, five,six]
+B = [one, two, three, four, five, six]
 for j in range(0, 6, 1):
     B[j] = Background(B[j])
 
@@ -2298,15 +2311,11 @@ def first_login_screen(lan, i, screen):
         A[i].draw_bg(screen)
 
 
-
-
-
 h_y = 200
 head_array = [0, 0, 0, 0, 0]
 
 
 def ketqua_screen(map, set, array_stt):
-
     global h_y
     if lan:
         result_screen = pygame.image.load("16.png")
@@ -2316,10 +2325,9 @@ def ketqua_screen(map, set, array_stt):
         result_screen = pygame.image.load("15.png")
         result_screen_bg = Background(result_screen)
         result_screen_bg.draw_bg(screen)
-    pygame.image.save(screen, "temp.png")  # Chụp trước khi vẽ nút save
-    save_but.draw_but(screen)
+    '''pygame.image.save(screen, "temp.png")'''  # Chụp trước khi vẽ nút save
 
-    exit_but.draw_but(screen)
+
     if check_press(exit_but.image_rect, pos):
         global list_stt
         list_stt = []
@@ -2496,6 +2504,8 @@ def ketqua_screen(map, set, array_stt):
     if check_press(save_but.image_rect, pos):
         screenshot.capture_screen(screen, user)
         time.sleep(0.5)
+    save_but.draw_but(screen)
+    exit_but.draw_but(screen)
 
     list_nv_win = [0, 0, 0, 0, 0]
     list_ranking = []
@@ -2662,7 +2672,6 @@ while True:
 
     global pos
     pos = pygame.mouse.get_pos()
-    print(pos)
 
     S_nv1 = Text(game_font2, str(int(w11_x / 5)), 0, 0, 0)
     S_nv2 = Text(game_font2, str(int(w12_x / 5)), 0, 0, 0, )
@@ -2722,14 +2731,14 @@ while True:
                 scroll_y -= 20
 
     if set_:
-        with open('first_log.txt','r') as file:
-            if file.read()=="1":
-                log1st=True
+        with open('first_log.txt', 'r') as file:
+            if file.read() == "1":
+                log1st = True
         if not log1st:
             menu_screen()
             music = 0
             store = store_func
-            shop = store.Store(lan, 1344 , 756)
+            shop = store.Store(lan, 1344, 756)
             store_img = pygame.image.load("extra_stuff/store/store.png")
             store = Button(store_img, 1200, 650, 200, 200)
             if lock:
@@ -2749,14 +2758,13 @@ while True:
                 coin_text = Text(game_font1, str(coin), 255, 200, 60)
                 coin_text.draw_text(screen, 1130, -6)
         else:
-            first_login_screen(not lan, i, screen)
+            first_login_screen(lan, i, screen)
             if check_press(pygame.rect.Rect(0, 0, 1344, 756), pos):
                 i += 1
-                if i == 5:
-                    with open('first_log.txt','w') as file:
+                if i == 6:
+                    log1st = False
+                    with open('first_log.txt', 'w') as file:
                         file.write("0")
-
-
 
     if wait:
         wait_screen()
@@ -2917,10 +2925,8 @@ while True:
                 s = podium.after_race(list_stt[0], list_stt[1], list_stt[2], list_stt[3], list_stt[4], choosen_set,
                                       screen,
                                       SCREEN_WIDTH, SCREEN_HEIGHT, win_or_lose)
-                next_but = Button(next_img, 1200, 720, 100, 50)
-                next_but.draw_but(screen)
-                if check_press(next_but.image_rect, pos):
-                    off_screen_except(s)
+                if s == 22:
+                    off_screen_except(22)
 
     if set1:
         current_time = pygame.time.get_ticks()
@@ -3070,15 +3076,11 @@ while True:
                     win_or_lose = False
 
             if min(w11_x, w12_x, w13_x, w14_x, w15_x) > finish + 30:
-
                 s = podium.after_race(list_stt[0], list_stt[1], list_stt[2], list_stt[3], list_stt[4], choosen_set,
                                       screen,
                                       SCREEN_WIDTH, SCREEN_HEIGHT, win_or_lose)
-
-                next_but = Button(next_img, 1200, 720, 100, 50)
-                next_but.draw_but(screen)
-                if check_press(next_but.image_rect, pos):
-                    off_screen_except(s)
+                if s == 22:
+                    off_screen_except(22)
 
     if set3:
         map3(pos)
@@ -3223,7 +3225,7 @@ while True:
         ketqua_screen(map, set, list_stt)
 
     if history_bool:
-        exit_but.draw_but(screen)
+
         if check_press(exit_but.image_rect, pos):
             off_screen_except(0)
 
@@ -3231,6 +3233,7 @@ while True:
         text_list = read_file2('account/' + str(user) + '/history.txt')
         scroll_y = max(0, min(scroll_y, len(text_list) * 20 * len(max(text_list, key=len))))
         draw_text_list(screen, text_list, font, scroll_y)
+        exit_but.draw_but(screen)
 
     pygame.display.update()
     clock.tick(60)

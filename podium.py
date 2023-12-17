@@ -108,9 +108,16 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
         return cur_frame
 
     off_screen = 0
-
     start_t = pygame.time.get_ticks()
     while True and off_screen == 0:
+        off_screen = 0
+        pygame.mixer.init()
+        with open('lan.txt', 'r') as language:
+            l = language.read()
+            if l == "1":
+                lang = True
+            else:
+                lang = False
         cur_time = pygame.time.get_ticks()
         if cur_time - start_t < 1000:
             if result:
@@ -138,20 +145,20 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
                         pygame.quit()
                         sys.exit()
 
-                        # vẽ từng thằng ra, mỗi thằng có một cái k riêng check frame hiện tại
+                            # vẽ từng thằng ra, mỗi thằng có một cái k riêng check frame hiện tại
                 k1 = drawf(k1, frame1, list1, pos1_dir, wnd_width // 36 * 15, wnd_height // 36 * 10,
-                           wnd_width // 16 * 3,
-                           wnd_height // 3, True)
+                               wnd_width // 16 * 3,
+                               wnd_height // 3, True)
                 k2 = drawf(k2, frame2, list2, pos2_dir, wnd_width // 36 * 10, wnd_height // 24 * 7, wnd_width // 16 * 3,
-                           wnd_height // 3, False)
+                               wnd_height // 3, False)
                 k3 = drawf(k3, frame3, list3, pos3_dir, wnd_width // 36 * 20, wnd_height // 24 * 7, wnd_width // 16 * 3,
-                           wnd_height // 3, True)
+                               wnd_height // 3, True)
                 k4 = drawf(k4, frame4, list4, pos4_dir, wnd_width // 5, wnd_height // 3 * 2, wnd_width // 16 * 3,
-                           wnd_height // 3, False)
+                               wnd_height // 3, False)
                 k5 = drawf(k5, frame5, list5, pos5_dir, wnd_width // 36 * 5, wnd_height // 3 * 2, wnd_width // 16 * 3,
-                           wnd_height // 3, False)
+                               wnd_height // 3, False)
             else:
-                off_screen = 22
+                off_screen=22
 
         pygame.display.update()
     return off_screen

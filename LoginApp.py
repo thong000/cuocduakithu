@@ -101,7 +101,7 @@ class LoginApp(App):
                         if not os.path.exists("account/" + str(name) + "/history.txt"):
                             with open("account/" + str(name) + "/history.txt", 'w') as file:
                                 file.write("Stt,Nhan vat,Ket qua,Tien cuoc,Tien nhan duoc,Thoi gian,Nguon goc")
-                                file.write('/n')
+                                file.write('\n')
 
                         # Kiem tra dang nhap
                         message = str(c)

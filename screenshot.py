@@ -5,8 +5,7 @@ from datetime import datetime
 import os
 
 
-def save_screenshot(image_path, docx_file):
-
+'''def save_screenshot(image_path, docx_file):
     with open('user.txt', 'r') as file:
         global user
         user = file.read()
@@ -18,27 +17,26 @@ def save_screenshot(image_path, docx_file):
     minute = current_time.minute
 
     doc = Document(docx_file)
-    time =str(user)+str(hour) + ":" + str(minute) + " ngày " + str(formatted_date)
+    time = str(user) + str(hour) + ":" + str(minute) + " ngày " + str(formatted_date)
 
     # Chèn ảnh và thời gian
     doc.add_paragraph(time)
     doc.add_picture(image_path, width=Inches(6.0))  # 6.0 là kích thước
-    doc.save(docx_file)
+    doc.save(docx_file)'''
 
 
-def capture_screen(screen,user):
+def capture_screen(screen, user):
     screenshot = pygame.Surface((1344, 756))
     screenshot.blit(screen, (0, 0))
     pygame.image.save(screenshot, "temp.png")
-    print("Màn hình đã được chụp và lưu thành công!")
 
-    directory_path = "account/" + str(user) + "/"
-    docx_file="account/" + str(user) + "/screenshot.docx"
+    directory_path = "temp_screenshot.docx"
+    docx_file = 'account/' + str(user) + '/screenshot.docx'
 
     # Cấp quyền truy cập cho thư mục
     try:
         # Set quyền truy cập cho owner (người sở hữu)
-        os.chmod(directory_path, 0o700)  # Ví dụ: 0o700 là quyền truy cập đầy đủ cho owner
+        os.chmod(directory_path, 0o777)  # Ví dụ: 0o700 là quyền truy cập đầy đủ cho owner
 
         # Set quyền truy cập cho group (nhóm)
         # os.chmod(directory_path, 0o770)  # Ví dụ: 0o770 là quyền truy cập đầy đủ cho owner và group
@@ -54,11 +52,10 @@ def capture_screen(screen,user):
     hour = current_time.hour
     minute = current_time.minute
 
-    doc = Document(docx_file)
+    doc = Document()
     time = str(user) + str(hour) + ":" + str(minute) + " ngày " + str(formatted_date)
 
     # Chèn ảnh và thời gian
     doc.add_paragraph(time)
     doc.add_picture("temp.png", width=Inches(6.0))  # 6.0 là kích thước
     doc.save(docx_file)
-
