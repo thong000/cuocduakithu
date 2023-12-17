@@ -1,7 +1,7 @@
 ﻿import pygame
 import os
 import sys
-
+pygame.init()
 pygame.mixer.init()
 with open('lan.txt', 'r') as language:
     l = language.read()
@@ -134,6 +134,7 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
         else:
 
             if chosen_set != 3:
+
                 sur.blit(bg, (0, 0))
                 mouse_pos = pygame.mouse.get_pos()
                 next_but.draw_but(sur)
@@ -157,6 +158,7 @@ def after_race(pos1, pos2, pos3, pos4, pos5, chosen_set, sur, wnd_width, wnd_hei
                                wnd_height // 3, False)
                 k5 = drawf(k5, frame5, list5, pos5_dir, wnd_width // 36 * 5, wnd_height // 3 * 2, wnd_width // 16 * 3,
                                wnd_height // 3, False)
+
             else:
                 off_screen=22
 

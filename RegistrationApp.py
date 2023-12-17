@@ -93,45 +93,49 @@ class RegistrationApp(App):
     def register(self, instance):
 
         # collect information
+
+        name = self.name_input.text
         if not os.path.exists("account/" + str(self.name_input.text)):
             os.makedirs("account/" + str(self.name_input.text))
-        name = self.name_input.text
-
         email = self.email_input.text
 
         password = self.password_input.text
 
         confirm_password = self.confirm_input.text
-
+        face_id_user = False
         filename_username = "account/" + str(name) + "/info.txt"
         filename_email = "account/" + str(name) + "/" + email + ".txt"
+        if os.path.exists(filename_username):
+            with open(filename_username, 'r') as file:
+                if file.read() == "NONE":
+                    face_id_user = True
 
         # validation
 
         if lan:
-            a="please fill in all fields"
-            b="Register Status"
-            c="Passwords do not match"
-            d= "Username existed! Please change other username!"
-            e= "Email has be used! Please change other email!"
-            f= "Check otp Form"
-            g="Check user otp"
-            h="Confirm Otp:"
-            i="Check"
-            j="Send otp"
-            k="Otp validation"
+            a = "please fill in all fields"
+            b = "Register Status"
+            c = "Passwords do not match"
+            d = "Username existed! Please change other username!"
+            e = "Email has be used! Please change other email!"
+            f = "Check otp Form"
+            g = "Check user otp"
+            h = "Confirm Otp:"
+            i = "Check"
+            j = "Send otp"
+            k = "Otp validation"
         else:
-            a="vui lòng nhập đâ đủ"
-            b="Tình trạng đăng kí"
-            c="Mật khẩu không hợp lệ"
-            d="Tên đăng nhập đã tồn tại! Vui lòng nhâp tên khác"
-            e="Email đã được sử dụng! Vui lòng sử dụng email khác"
-            f="Biểu mẫu kiểm tra OTP"
-            g="Kiểm tra OTP"
-            h="Xác nhận OTP"
-            i="Kiểm tra"
-            j="Gửi OTP"
-            k="Xác thực OTP"
+            a = "vui lòng nhập đâ đủ"
+            b = "Tình trạng đăng kí"
+            c = "Mật khẩu không hợp lệ"
+            d = "Tên đăng nhập đã tồn tại! Vui lòng nhâp tên khác"
+            e = "Email đã được sử dụng! Vui lòng sử dụng email khác"
+            f = "Biểu mẫu kiểm tra OTP"
+            g = "Kiểm tra OTP"
+            h = "Xác nhận OTP"
+            i = "Kiểm tra"
+            j = "Gửi OTP"
+            k = "Xác thực OTP"
 
         if name.strip() == '' or email.strip() == '' or password.strip() == '' or confirm_password.strip() == '':
 
@@ -149,7 +153,7 @@ class RegistrationApp(App):
                                 size=(400, 200))
             popup_final.open()
 
-        elif os.path.exists(filename_username):
+        elif os.path.exists(filename_username) and not face_id_user:
 
             message = str(d)
             popup_final = Popup(title=str(b), content=Label(text=message), size_hint=(None, None),
@@ -220,9 +224,9 @@ class RegistrationApp(App):
             else:
                 message = "OTP không đúng"
             if lan:
-                a="Register Status"
+                a = "Register Status"
             else:
-                a="Tình trạng đăng nhập"
+                a = "Tình trạng đăng nhập"
             popup_final = Popup(title=str(a), content=Label(text=message), size_hint=(None, None),
                                 size=(400, 200))
             popup_final.open()
@@ -258,9 +262,9 @@ class RegistrationApp(App):
                     file.write(i + ": " + user_email[i])
 
             if lan:
-                a="Register Status"
+                a = "Register Status"
             else:
-                a="Tình trạng đăng nhập"
+                a = "Tình trạng đăng nhập"
             if lan:
 
                 message = "Registration suscessful\nName: {}\nEmail: {}".format(name, email)

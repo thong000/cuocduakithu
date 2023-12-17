@@ -1,4 +1,3 @@
-import os
 import textwrap
 import pygame
 import random
@@ -12,12 +11,9 @@ import store_func
 import Rule
 import podium
 import screenshot
-import shutil
 import re
-import faceid_python
-from pygame.locals import *
 
-from faceid_python import function_faceid
+import function_faceid
 
 pygame.init()
 pygame.mixer.init()

@@ -1,4 +1,3 @@
-import os
 import textwrap
 import pygame
 import random
@@ -12,12 +11,9 @@ import store_func
 import Rule
 import podium
 import screenshot
-import shutil
 import re
-import faceid_python
-from pygame.locals import *
 
-from faceid_python import function_faceid
+import function_faceid
 
 pygame.init()
 pygame.mixer.init()
@@ -2775,6 +2771,7 @@ while True:
         music = 1
         current_time = pygame.time.get_ticks()
         elapsed_time = current_time - start_time
+
         if elapsed_time < 1000:
             background2.draw_bg(screen)
             pygame.mixer.music.stop()
@@ -2791,6 +2788,7 @@ while True:
             one_but.draw_but(screen)
         elif elapsed_time < time_limit + 1000:
             background2.draw_bg(screen)
+
             if lan:
                 start_but.draw_but(screen)
             else:
@@ -2799,6 +2797,7 @@ while True:
             pygame.mixer.music.load("music/lucvodua2.mp3")
             pygame.mixer.music.play(-1)
             w11_x = w12_x = w13_x = w14_x = w15_x = 10
+
         else:
 
             boom_but1 = Button(boom, box_but1.x, 225, 90, 90)
@@ -2806,7 +2805,9 @@ while True:
             boom_but3 = Button(boom, box_but3.x, 470, 90, 90)
             boom_but4 = Button(boom, box_but4.x, 570, 90, 90)
             boom_but5 = Button(boom, box_but5.x, 660, 90, 90)
+
             map2(pos)
+            
             if check_press(exit_but.image_rect, pos):
                 pygame.mixer.music.stop()
                 pygame.mixer.music.load("music/nhacnengame.mp3")

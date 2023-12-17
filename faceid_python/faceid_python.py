@@ -1,11 +1,5 @@
-﻿import cv2
-from deepface import DeepFace
-import sys
-import pygame
-import pygame.camera
+﻿import sys
 import pygame.image
-import numpy
-import os
 
 import function_faceid  # import này vào file chính
 

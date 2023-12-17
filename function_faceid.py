@@ -382,6 +382,48 @@ def FaceID(lang, wnd_width, wnd_height, screen):
                 if check_press(back_but.image_rect, pos):
                     log2 = 0
                     log1 = 1
+        if login_success:
+            if not os.path.exists("account/" + str(login_account)):
+                os.makedirs("account/" + str(login_account))
+                # Tạo mới folder mang tên của tài khoản nếu chưa có
+                if not os.path.exists("account/" + str(login_account)):
+                    os.makedirs("account/" + str(login_account))
+
+                #######tạo mới các file lưu thông tin người chơi nếu chưa có
+
+                # information
+                if not os.path.exists("account/" + str(login_account) + "/info.txt"):
+                    with open("account/" + str(login_account) + "/info.txt", 'w') as file:
+                        #Dấu hiệu nhận biết người dùng face_id
+                        file.write("NONE")
+                # coin
+                if not os.path.exists("account/" + str(login_account) + "/coin.txt"):
+                    with open("account/" + str(login_account) + "/coin.txt", 'w') as file:
+                        file.write("100")
+                # History
+                if not os.path.exists("account/" + str(login_account) + "/history.txt"):
+                    with open("account/" + str(login_account) + "/history.txt", 'w') as file:
+                        file.write("Stt,Nhan vat,Ket qua,Tien cuoc,Tien nhan duoc,Thoi gian,Nguon goc")
+                        file.write('\n')
+                with open('log.txt', 'w') as file:
+                    file.write(str(1))
+
+                # Xác định user
+                with open('user.txt', 'w') as file:
+                    file.write(login_account)
+
+                # Stt của lịch sử
+                if not os.path.exists("account/" + str(login_account) + "/stt.txt"):
+                    with open("account/" + str(login_account) + "/stt.txt", 'w') as file:
+                        file.write("1")
+
+                # screenshot
+                if not os.path.exists("account/" + str(login_account) + "/screenshot.docx"):
+                    with open("account/" + str(login_account) + "/screenshot.docx", 'w') as file:
+                        file.write("")
+                    # Xem có phải lần đầu đăng nhập không
+                    with open('first_log.txt', 'w') as file:
+                        file.write("1")
 
         clock.tick(60)
         pygame.display.update()

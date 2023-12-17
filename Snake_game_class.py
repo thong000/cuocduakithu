@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pygame, random, sys,re
 pygame.init()
-
+pygame.mixer
 
 write_history_active=False
 def read_file(file_path):
